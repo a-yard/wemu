@@ -2,13 +2,14 @@
 #define __CPUEXEC_H__
 #include "ISA.hpp"
 #include "Memory.hpp"
+#include "BUS.hpp"
 class CPU
 {
 private:
     ISA *ISAObj;
 
 public:
-    CPU(Memory * InMemory);
+    CPU(BUS * InBUS);
     ~CPU();
 };
 

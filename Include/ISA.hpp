@@ -3,12 +3,12 @@
 #include "common.hpp"
 #include "Memory.hpp"
 class ISA{
-    private:
-        Memory * MemoryObj;
+    protected:
+        BUS * BUSObj;
     public:
         virtual VAddr_t Get_PC();
         virtual void isa_exec_once();
-        ISA (Memory * InMemory);
+        ISA (BUS * InBUS);
         
 
 };
