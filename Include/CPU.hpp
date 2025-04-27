@@ -1,15 +1,15 @@
 #ifndef __CPUEXEC_H__
 #define __CPUEXEC_H__
 #include "ISA.hpp"
-class CPUExec
+#include "Memory.hpp"
+class CPU
 {
 private:
-    ISA * ISAObj;
+    ISA *ISAObj;
+
 public:
-    CPUExec();
-    ~CPUExec();
+    CPU(Memory * InMemory);
+    ~CPU();
 };
-
-
 
 #endif

@@ -1,4 +1,4 @@
-#include "../../Include/ISA.hpp"
+#include "../../../Include/ISA.hpp"
 
 ISA::ISA(Memory * InMemory){
     this->MemoryObj = InMemory;

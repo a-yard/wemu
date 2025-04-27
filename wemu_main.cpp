@@ -1,5 +1,6 @@
-#include "Include/SOC.hpp"
+#include "Include/Monitor.hpp"
 
-int main(){
-    SOC * SOCObj = new SOC();
+int main(int argc, char *argv[]){
+    Monitor * MonitorObj = new Monitor(argc,argv);
+    return MonitorObj->is_exit_status_bad();
 }
