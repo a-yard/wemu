@@ -4,10 +4,12 @@
 #include "CPU.hpp"
 #include "BUS.hpp"
 class SOC{
-    private:
+    public:
         Memory * MemoryObj;
         CPU * CPUObj;
         BUS * BUSObj;
+        WEMUState * WEMUStateObj;
+        SOC(WEMUState * InWEMUState);
         
 };
 

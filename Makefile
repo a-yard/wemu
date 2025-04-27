@@ -2,6 +2,7 @@
 
 menuconfig:
 	@kconfig-mconf KConfig
+	@./KConfig.sh
 	
 GetColCount:
 	@echo "C++ 行数"

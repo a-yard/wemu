@@ -21,7 +21,7 @@ char *sdb::rl_gets()
 
 int sdb::cmd_c(char *args)
 {
-  this->CPUExecObj->cpu_exec(-1);
+  this->CPUObj->cpu_exec(-1);
   return 0;
 }
 
@@ -36,7 +36,7 @@ int sdb::cmd_si(char *args)
   int n = 1;
   if (args != NULL)
     n = atoi(args);
-  this->CPUExecObj->cpu_exec(n);
+  this->CPUObj->cpu_exec(n);
   return 0;
 }
 
@@ -44,11 +44,11 @@ int sdb::cmd_info(char *args)
 {
   char *str = strtok(NULL, " ");
   if (strcmp(str, "r") == 0)
-    this->CPUExecObj->HaiTangCPUObj->DesplayCPU_state();
+    this->CPUObj->HaiTangCPUObj->DesplayCPU_state();
   else if(strcmp(str, "rp") == 0)
-  this->CPUExecObj->HaiTangCPUObj->DesplayCPUPhy_state();
+  this->CPUObj->HaiTangCPUObj->DesplayCPUPhy_state();
   else if(strcmp(str, "srat") == 0)
-  this->CPUExecObj->HaiTangCPUObj->DesplaySRAT();
+  this->CPUObj->HaiTangCPUObj->DesplaySRAT();
   else if (strcmp(str, "w") == 0)
     this->watchpointObj->displaywatch();
   else
@@ -187,7 +187,7 @@ void sdb::sdb_mainloop()
   }
 }
 
-sdb::sdb(Memory *InmemoryObj,CPUExec * InCPUExec)
+sdb::sdb(Memory *InmemoryObj,CPU * InCPU)
 {
 
 
@@ -195,7 +195,7 @@ sdb::sdb(Memory *InmemoryObj,CPUExec * InCPUExec)
   
   this->watchpointObj = new watchpoint(this->exprObj);
   
-  CPUExecObj = InCPUExec;//new CPUExec(InNPC_State);
+  CPUObj = InCPU;//new CPUExec(InNPC_State);
   
   this->memoryObj = InmemoryObj;
   

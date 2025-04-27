@@ -2,6 +2,7 @@
 #define __ISA_H__
 #include "common.hpp"
 #include "Memory.hpp"
+#include "BUS.hpp"
 class ISA{
     protected:
         BUS * BUSObj;

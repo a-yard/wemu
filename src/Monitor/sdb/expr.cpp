@@ -295,7 +295,7 @@ Word_t expr::eval(int p,int q){
      
       if(op_type==DEREF){
         
-        return MemoryObj->PAddrRead(eval(p+1,q),4); 
+        return BUSObj->BUSRead(eval(p+1,q),4); 
       }else if(op_type==minussign){
         return (0u-eval(p+1,q));
       }

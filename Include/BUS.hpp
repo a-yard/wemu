@@ -5,7 +5,7 @@ class BUS{
     private:
         Memory * MemoryObj;
     public:
-        Word_t BUSRead(VAddr_t RAddr);
+        Word_t BUSRead(VAddr_t RAddr,int len);
         void BUSWirte(VAddr_t WAddr,Word_t WData,int WMask);
         BUS (Memory * InMemory);
 };

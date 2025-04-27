@@ -22,7 +22,7 @@ private:
     } cmd_table[9];
     watchpoint *watchpointObj;
     expr *exprObj;
-    Memory *memoryObj;
+    BUS *BUSObj;
     
     char *rl_gets();
     int cmd_c(char *args);
@@ -36,10 +36,10 @@ private:
     int cmd_help(char *args);
     int SelectFun(int n,char *args);
     WEMUState * NPC_State;
-    CPU *CPUExecObj;
+    CPU *CPUObj;
 
 public:
-    sdb(Memory *,CPU * InCPUExec);
+    sdb(BUS *,CPU * InCPU);
     ~sdb();
     void sdb_mainloop();
     

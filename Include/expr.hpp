@@ -3,7 +3,7 @@
 #include "common.hpp"
 #include <regex.h>
 // #include "macro.h"
-#include "Memory.hpp"
+#include "BUS.hpp"
 enum {
   TK_NOTYPE = 256, TK_EQ,NUMBER,DEREF,regName,hexadecimalNumber,minussign,
   AND,OR,NO_TK_EQ,LESS_THAN,GREATER_THAN,Greater_than_or_equal,Less_Than_or_equal,
@@ -44,7 +44,7 @@ static struct rule {
   #define NR_REGEX ARRLEN(rules)
 
   static regex_t re[NR_REGEX] = {};
-  
+
   typedef struct token {
     int type;
     char str[32];
@@ -55,7 +55,7 @@ static struct rule {
 class expr
 {
 private:
-    Memory * MemoryObj;
+    BUS * BUSObj;
 public:
     expr(/* args */);
     ~expr();

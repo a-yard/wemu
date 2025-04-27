@@ -1,0 +1,8 @@
+menu "Memory"
+config SELECT_MEMORY_SIZE            # 填空
+    hex "Memory size"                       # 填空的题干
+    default 80000000                             # 默认填空答案
+config SELECT_CONFIG_MBASE            # 填空
+    hex "Memory BASE"                       # 填空的题干
+    default 80000000                             # 默认填空答案
+endmenu

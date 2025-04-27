@@ -1,5 +1,5 @@
 #include "../../../Include/ISA.hpp"
 
-ISA::ISA(Memory * InMemory){
-    this->MemoryObj = InMemory;
+ISA::ISA(BUS * InBUS){
+    this->BUSObj = InBUS;
 }

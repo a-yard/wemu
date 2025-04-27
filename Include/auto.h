@@ -1,0 +1,3 @@
+// Auto Create
+#define MEMORY_SIZE  0x80000000
+#define CONFIG_MBASE  0x80000000
