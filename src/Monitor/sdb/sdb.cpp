@@ -44,11 +44,7 @@ int sdb::cmd_info(char *args)
 {
   char *str = strtok(NULL, " ");
   if (strcmp(str, "r") == 0)
-    this->CPUObj->HaiTangCPUObj->DesplayCPU_state();
-  else if(strcmp(str, "rp") == 0)
-  this->CPUObj->HaiTangCPUObj->DesplayCPUPhy_state();
-  else if(strcmp(str, "srat") == 0)
-  this->CPUObj->HaiTangCPUObj->DesplaySRAT();
+    this->CPUObj->ISAObj->DesplayCPU_state();
   else if (strcmp(str, "w") == 0)
     this->watchpointObj->displaywatch();
   else
@@ -69,7 +65,7 @@ int sdb::cmd_x(char *args)
     printf("0x%-10x:   ", i + number);
     for (int j = 0; j < 4; j++)
     {
-      printf("0x%-10.2x", memoryObj->PAddrRead((i + j) + number, 1));
+      printf("0x%-10.2x", BUSObj->BUSRead((i + j) + number, 1));
     }
     printf("\n");
   }
@@ -187,7 +183,7 @@ void sdb::sdb_mainloop()
   }
 }
 
-sdb::sdb(Memory *InmemoryObj,CPU * InCPU)
+sdb::sdb(BUS *InBUS,CPU * InCPU)
 {
 
 
@@ -196,8 +192,8 @@ sdb::sdb(Memory *InmemoryObj,CPU * InCPU)
   this->watchpointObj = new watchpoint(this->exprObj);
   
   CPUObj = InCPU;//new CPUExec(InNPC_State);
-  
-  this->memoryObj = InmemoryObj;
+  this->BUSObj = InBUS;
+
   
   
   this->cmd_table[0] = {"help", "Display information about all supported commands"};

@@ -7,8 +7,9 @@ class ISA{
     protected:
         BUS * BUSObj;
     public:
-        virtual VAddr_t Get_PC();
-        virtual void isa_exec_once();
+        virtual VAddr_t Get_PC()=0;
+        virtual int isa_exec_once()=0;
+        virtual void DesplayCPU_state()=0;
         ISA (BUS * InBUS);
         
 

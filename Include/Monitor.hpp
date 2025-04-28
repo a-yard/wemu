@@ -4,15 +4,26 @@
 #include "SOC.hpp"
 #include "WEMUState.hpp"
 #include "sdb.hpp"
-class Monitor{
-    private:
-        SOC * SCOObj;
-        sdb * sdbObj;
-        WEMUState * WEMUStateObj;
-    public:
-        Monitor(int argc, char *argv[]);
-        ~Monitor();
-        int is_exit_status_bad() ;
+#include <getopt.h>
+#define no_argument 0
+#define required_argument 1
+#define optional_argument 2
+
+class Monitor
+{
+private:
+    char *img_file;
+    char *elf_file;
+    char *diff_so_file;
+    SOC *SCOObj;
+    sdb *sdbObj;
+    WEMUState *WEMUStateObj;
+
+public:
+    Monitor(int argc, char *argv[]);
+    ~Monitor();
+    int is_exit_status_bad();
+    int parse_args(int argc, char *argv[]);
 };
 
 #endif

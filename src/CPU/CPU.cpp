@@ -2,7 +2,7 @@
 
 CPU::CPU(BUS *InBUS,WEMUState * InWEMUState)
 {
-    this->ISAObj = new ISA(InBUS);
+    this->ISAObj = new riscv32(InWEMUState,InBUS);
     this->WEMUStateObj = InWEMUState;
 }
 

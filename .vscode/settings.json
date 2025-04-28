@@ -3,6 +3,12 @@
         "**/project.sigasi": "jsonc",
         "**/.sigasi/**/compilation.log": "shellscript",
         "**/.sigasi/**/compilation.plan": "json",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "array": "cpp",
+        "compare": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     }
 }

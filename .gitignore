@@ -1,3 +1,8 @@
 .config
 
 .config.old
+
+build/
+
+.vscode/
+
