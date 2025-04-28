@@ -22,6 +22,6 @@ GetColCount:
 	@find . -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec cat {} + | wc -l
 
 run:
-	g++  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
-	./build/wemu
+	@g++  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
+	@./build/wemu -b  -e $(elf)   $(IMG) 
 

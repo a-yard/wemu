@@ -57,13 +57,13 @@ private:
     Word_t inst;
     void set_wemu_state(int state, VAddr_t pc, int halt_ret);
     void invalid_inst(VAddr_t thispc);
+    unsigned char isa_logo[580];
 
 public:
     riscv32(WEMUState *InWEMUState,BUS * InBUS);
-    ~riscv32();
     VAddr_t Get_PC();
     int isa_exec_once();
     void DesplayCPU_state();
-
+    void PrintfLog();
 };
 #endif

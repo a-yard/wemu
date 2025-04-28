@@ -174,18 +174,18 @@ void Memory::host_write(void *addr, int len, uint32_t data)
 
 uint32_t Memory::PMemRead(uint32_t addr, int len)
 {
-    if (addr > 0x80000000)
-    {
-        out_of_bound(addr);
-    }
+    // if (addr > 0x80000000)
+    // {
+        // out_of_bound(addr);
+    // }
     return host_read(GuestToHost(addr), len);
 }
 void Memory::PMemwrite(uint32_t addr, int len, uint32_t data)
 {
-    if (addr > 0x80000000)
-    {
-        out_of_bound(addr);
-    }
+    // if (addr > 0x80000000)
+    // {
+    //     out_of_bound(addr);
+    // }
     host_write(GuestToHost(addr), len, data);
 }
 
@@ -196,6 +196,7 @@ void Memory::out_of_bound(uint32_t addr)
 }
 
 void Memory::load_img(char* ImgFile){
+    printf("%s\n\n",ImgFile);
     if (ImgFile == NULL) {
         this->img_size= 4096; // built-in image size
         return;

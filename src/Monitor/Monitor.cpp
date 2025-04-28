@@ -2,8 +2,9 @@
 Monitor::Monitor(int argc, char *argv[]){
     this->parse_args(argc,argv);
     this->WEMUStateObj = new WEMUState();
-    this->SCOObj = new SOC(WEMUStateObj);
-    this->sdbObj = new sdb(SCOObj->BUSObj,SCOObj->CPUObj);
+    printf("%s",this->img_file);
+    this->SOCObj = new SOC(WEMUStateObj,this->img_file);
+    this->sdbObj = new sdb(SOCObj->BUSObj,SOCObj->CPUObj);
     this->sdbObj->sdb_mainloop();
 }
 

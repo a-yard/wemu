@@ -15,7 +15,7 @@ private:
     char *img_file;
     char *elf_file;
     char *diff_so_file;
-    SOC *SCOObj;
+    SOC *SOCObj;
     sdb *sdbObj;
     WEMUState *WEMUStateObj;
 

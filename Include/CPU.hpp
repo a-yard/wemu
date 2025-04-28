@@ -17,6 +17,7 @@ public:
     CPU(BUS * InBUS,WEMUState * InWEMUState);
     void cpu_exec(uint64_t n);
     ISA *ISAObj;
+    void statistic();
 };
 
 #endif
