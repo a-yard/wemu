@@ -43,6 +43,7 @@ enum {
 #define immB() do {*imm = (SEXT(BITS(i,31,31),1)<<12 | BITS(i,30,25)<<5 | BITS(i,11,8)<<1 | BITS(i,7,7)<<11);}while(0)
 
 
+
 class riscv32 : public ISA
 {
 private:

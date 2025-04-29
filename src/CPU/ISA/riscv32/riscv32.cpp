@@ -62,10 +62,10 @@ void riscv32::restart()
 {
     /* Set the initial program counter. */
     CPU_State.pc = RESET_VECTOR;
-    CPU_State.mepc = 0;
-    CPU_State.mstatus = 0x1800;
-    CPU_State.mcause = 0;
-    CPU_State.mtvec = 0;
+    // CPU_State.mepc = 0;
+    // CPU_State.mstatus = 0x1800;
+    // CPU_State.mcause = 0;
+    // CPU_State.mtvec = 0;
     /* The zero register is always 0. */
     CPU_State.gpr[0] = 0;
 
@@ -112,7 +112,8 @@ void riscv32::decode_operand(int *rd, Word_t *src1, Word_t *src2, Word_t *imm, i
 int riscv32::decode_exec()
 {
     int rd = 0;
-    Word_t src1 = 0, src2 = 0, imm = 0;
+    Word_t src1 = 0, src2 = 0, imm = 0,zimm=0;
+    zimm = (this->inst<<12)>>27;
     this->dnpc = this->snpc;
 
     INSTPAT_START();
@@ -150,11 +151,19 @@ int riscv32::decode_exec()
     INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu, I, R(rd) = Mr(src1 + SIGNEDEXTENSIONS(imm, 12), 1));
     INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu, I, R(rd) = Mr(src1 + SIGNEDEXTENSIONS(imm, 12), 2));
     INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr, I, R(rd) = this->pc + 4; this->dnpc = src1 + SIGNEDEXTENSIONS(imm, 12));
+    //csr
+    INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t = csr(imm);csr(imm)=src1;R(rd)=t);
+    INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = csr(imm);csr(imm)=src1 | t;R(rd)=t);
+    INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = csr(imm);csr(imm)=src1 & t;R(rd)=t);
+    INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t = csr(imm);csr(imm)=zimm;R(rd)=t);     //note
+    INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = csr(imm);csr(imm)=t |zimm;R(rd)=t);  //note
+    INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = csr(imm);csr(imm)=t &zimm;R(rd)=t);  //note
 
-    // INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, swap_csr_r(imm, src1, &R(rd)));
-    // INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I, this->dnpc = isa_raise_intr(11, this->pc); etrace_print(11, this->pc););
-    // INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t *csr = get_csr(imm); Word_t t = *csr; *csr = t | src1; R(rd) = t;);
-    // INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, this->dnpc = cpu.mepc; printf("ret -> %x\n", this->dnpc)); // cpu.mcause= 8;
+
+    INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I,this->dnpc=csr(0x305); csr(0x341)=this->pc;csr(0x342)=11;);//note
+    INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, this->dnpc = csr(0x341); ); // cpu.mcause= 8;  //note
+
+    INSTPAT("0000??? ????? 00000 000 00000 00011 11", fence, I, ); // cpu.mcause= 8;  //note
 
     INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb, S, Mw(src1 + (SIGNEDEXTENSIONS(imm, 12)), 1, src2));
     INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh, S, Mw(src1 + (SIGNEDEXTENSIONS(imm, 12)), 2, src2));
@@ -216,23 +225,23 @@ void riscv32::set_wemu_state(int state, VAddr_t pc, int halt_ret)
 }
 void riscv32::invalid_inst(VAddr_t thispc)
 {
-    
+
     uint32_t temp[2];
     VAddr_t pc = thispc;
     temp[0] = this->BUSObj->BUSRead(pc, 4);
     temp[1] = this->BUSObj->BUSRead(pc, 4);
 
     uint8_t *p = (uint8_t *)temp;
-    printf("invalid opcode(PC = 0x%016):\n"
+    printf("invalid opcode(PC = 0x%016x):\n"
            "\t%02x %02x %02x %02x %02x %02x %02x %02x ...\n"
            "\t%08x %08x...\n",
            thispc, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], temp[0], temp[1]);
 
     printf("There are two cases which will trigger this unexpected exception:\n"
-           "1. The instruction at PC = 0x%016 is not implemented.\n"
+           "1. The instruction at PC = 0x%016x is not implemented.\n"
            "2. Something is implemented incorrectly.\n",
            thispc);
-    printf("Find this PC(0x%016) in the disassembling result to distinguish which case it is.\n\n", thispc);
+    printf("Find this PC(0x%016x) in the disassembling result to distinguish which case it is.\n\n", thispc);
     printf(ANSI_FMT("If it is the first case, see\n%s\nfor more details.\n\n"
                     "If it is the second case, remember:\n"
                     "* The machine is always right!\n"

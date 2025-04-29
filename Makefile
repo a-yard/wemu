@@ -13,6 +13,8 @@ C_SRC = $(wemu_HOME)/wemu_main.cpp \
 
 LIBS  += -lreadline -lhistory
 
+
+
 menuconfig:
 	@kconfig-mconf KConfig
 	@./KConfig.sh
@@ -22,6 +24,11 @@ GetColCount:
 	@find . -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec cat {} + | wc -l
 
 run:
-	@g++  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
+	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
 	@./build/wemu -b  -e $(elf)   $(IMG) 
 
+getTest:
+	cp -rf /home/wsp/riscv-tests/isa/rv32* ./test/isa/
+	echo $(rv32uiPTests)
+
+include TestMakefile.mk

@@ -34,7 +34,7 @@ void CPU::cpu_exec(uint64_t n)
         case WEMU_END: case WEMU_ABORT:
           printf("NPC: %s at pc = %x\n" ,
               (WEMUStateObj->state == WEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
-               (WEMUStateObj->halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
+               (WEMUStateObj->ReturnCode == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
                 ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
                 WEMUStateObj->halt_pc);
           
@@ -45,5 +45,5 @@ void CPU::cpu_exec(uint64_t n)
 
 
 void CPU::statistic(){
-    
+
 }
