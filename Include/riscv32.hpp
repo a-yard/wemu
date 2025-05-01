@@ -66,5 +66,6 @@ public:
     int isa_exec_once();
     void DesplayCPU_state();
     void PrintfLog();
+    Word_t Get_gpr(int n);
 };
 #endif

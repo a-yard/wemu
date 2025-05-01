@@ -9,7 +9,7 @@ Monitor::Monitor(int argc, char *argv[]){
 }
 
 int Monitor::is_exit_status_bad() {
-    int good = (WEMUStateObj->state == WEMU_END && WEMUStateObj->halt_ret == 0) ||
+    int good = (WEMUStateObj->state == WEMU_END && WEMUStateObj->halt_ret == 1) ||
       (WEMUStateObj->state == WEMU_QUIT) ;
     return !good;
  }

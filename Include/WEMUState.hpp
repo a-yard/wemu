@@ -15,6 +15,5 @@ public:
     int state;
     VAddr_t halt_pc;
     uint32_t halt_ret;
-    int ReturnCode;
 };
 #endif

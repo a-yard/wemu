@@ -14,7 +14,7 @@ Word_t BUS::BUSRead(VAddr_t RAddr,int len){
 void BUS::BUSWirte(VAddr_t WAddr,Word_t WData,int WMask){
     if(WAddr==0x80001000){
         this->WEMUStateObj->state = WEMU_END;
-        this->WEMUStateObj->ReturnCode = WData;
+        printf("--%d--\n",WData);
     }
     if(WAddr<=MEMORY_SIZE+CONFIG_MBASE-1&WAddr>=CONFIG_MBASE){
         this->MemoryObj->PMemwrite(WAddr,WData,WMask);

@@ -25,7 +25,7 @@ GetColCount:
 
 run:
 	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
-	@./build/wemu -b  -e $(elf)   $(IMG) 
+	@./build/wemu   -b   $(IMG) 
 
 getTest:
 	cp -rf /home/wsp/riscv-tests/isa/rv32* ./test/isa/

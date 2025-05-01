@@ -11,6 +11,7 @@ class ISA{
         virtual int isa_exec_once()=0;
         virtual void DesplayCPU_state()=0;
         ISA (BUS * InBUS);
+        virtual Word_t Get_gpr(int n)=0;
         
 
 };

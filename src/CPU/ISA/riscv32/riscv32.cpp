@@ -128,13 +128,6 @@ int riscv32::decode_exec()
     INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra, R, R(rd) = (signed)src1 >> (src2 & 0x0000001f));
     INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or, R, R(rd) = src1 | src2);
     INSTPAT("0000000 ????? ????? 111 ????? 01100 11", sub, R, R(rd) = src1 & src2);
-    INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem, R, R(rd) = (Word_t)((signed)src1 % (signed)src2));                                          // note
-    INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R, R(rd) = (Word_t)(src1 % src2));                                                         // note
-    INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = src1 * src2);                                                                    // note
-    INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div, R, R(rd) = ((signed)src1 / (signed)src2));                                                  // note
-    INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu, R, R(rd) = src1 / src2);                                                                   // note
-    INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * ((signed long)(signed)src2)) >> 32)); // note
-    INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu, R, R(rd) = ((((unsigned long)(unsigned)src1) * ((unsigned long)(unsigned)src2)) >> 32));  // note
 
     INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi, I, R(rd) = src1 + SIGNEDEXTENSIONS(imm, 12));
     INSTPAT("??????? ????? ????? 010 ????? 00100 11", sltiu, I, R(rd) = (src1 < (SIGNEDEXTENSIONS(imm, 12))) ? 1 : 0);
@@ -182,6 +175,23 @@ int riscv32::decode_exec()
     INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal, J, R(rd) = this->pc + 4; this->dnpc = this->pc + SIGNEDEXTENSIONS(imm, 21)); // rd默认为x1
 
     INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N, set_wemu_state(WEMU_END, this->pc, R(10))); // R(10) is $a0
+
+
+    //M
+    INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = src1 * src2);                                                                    // note
+    INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * ((signed long)(signed)src2)) >> 32)); // note
+    INSTPAT("0000001 ????? ????? 010 ????? 01100 11", mulhsu, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * (src2)) >> 32)); // note
+    INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu, R, R(rd) = ((((unsigned long)(unsigned)src1) * ((unsigned long)(unsigned)src2)) >> 32));  // note
+    INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div, R, R(rd) = ((signed)src1 / (signed)src2));                                                  // note
+    INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu, R, R(rd) = src1 / src2);                                                                   // note
+    INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem, R, R(rd) = (Word_t)((signed)src1 % (signed)src2));                                          // note
+    INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R, R(rd) = (Word_t)(src1 % src2));                                                         // note
+    
+    
+    
+
+
+
     INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, invalid_inst(this->pc));
 
     INSTPAT_END();
@@ -196,7 +206,6 @@ int riscv32::isa_exec_once()
 
     this->inst = this->BUSObj->BUSRead(this->pc, 4);
     this->snpc = this->pc + 4;
-
     // cout << "PC:" << hex << this->pc << ": 0x" << hex << inst << endl;
 
     this->decode_exec();
@@ -256,4 +265,7 @@ void riscv32::PrintfLog()
 {
 
     cout << this->isa_logo << endl;
+}
+Word_t riscv32::Get_gpr(int n){
+    return this->CPU_State.gpr[n];
 }
