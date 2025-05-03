@@ -2,9 +2,9 @@
 
 Memory::Memory()
 {
-    this->BlockDeviceBASE = MEMORY_BASE;
-    this->BlockDeviceSIZE = MEMORY_SIZE;
-    this->PMem = (uint8_t *)malloc(MEMORY_SIZE);
+    this->BlockDeviceBASE = Memory_BASE;
+    this->BlockDeviceSIZE = Memory_SIZE;
+    this->PMem = (uint8_t *)malloc(BlockDeviceSIZE);
     static const uint32_t init_img[] = {
         0x00d605b3,
         0x00d605b3,
@@ -124,7 +124,7 @@ Memory::Memory()
         0x00d605b3,
     };
     
-    memcpy(GuestToHost(MEMORY_BASE), init_img, sizeof(init_img));
+    memcpy(GuestToHost(BlockDeviceBASE), init_img, sizeof(init_img));
 
 }
 

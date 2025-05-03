@@ -60,7 +60,7 @@ void BlockDevice::load_img(char* ImgFile){
       long size = ftell(fp);
     
       fseek(fp, 0, SEEK_SET);
-      int ret = fread(GuestToHost(MEMORY_BASE), size, 1, fp);
+      int ret = fread(GuestToHost(this->BlockDeviceBASE), size, 1, fp);
     
       fclose(fp);
       img_size=size;

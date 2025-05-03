@@ -1,6 +1,6 @@
 // Auto Create
-#define MEMORY_SIZE  0x10000000
-#define MEMORY_BASE  0x80000000
+#define Memory_SIZE  0x10000000
+#define Memory_BASE  0x80000000
 #define SRAM_SIZE  0x01000000
 #define SRAM_BASE  0x0f000000
 #define FLASH_SIZE  0x10000000
