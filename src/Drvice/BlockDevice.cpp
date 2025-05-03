@@ -42,7 +42,7 @@ void BlockDevice::host_write(void *addr, int len, uint32_t data)
 
 void BlockDevice::out_of_bound(uint32_t addr){
     if((addr>this->BlockDeviceBASE&&addr>=this->BlockDeviceBASE<this->BlockDeviceSIZE+this->BlockDeviceBASE)){
-        cout << "access BlockDevice out of bound:" << hex << addr << endl;
+        cout << "access BlockDevice out of bound: 0x" << hex << addr << endl;
         assert(0);
     }
 }

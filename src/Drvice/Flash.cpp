@@ -7,13 +7,7 @@ Flash::Flash(){
 
 }
 
-uint32_t Flash::DrviceRead(uint32_t addr, int len){
-    return host_read(GuestToHost(addr), len);
+Flash::Flash(char* ImgFile){
+    Flash();
+    this->load_img(ImgFile);
 }
-
-void Flash::DrviceWrite(uint32_t addr, int len, uint32_t data)
-{
-
-    host_write(GuestToHost(addr), len, data);
-}
-

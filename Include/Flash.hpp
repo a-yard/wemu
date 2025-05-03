@@ -6,8 +6,8 @@ class Flash : public BlockDevice
 {
 public:
     Flash();
-    uint32_t DrviceRead(uint32_t addr, int len);
-    void DrviceWrite(uint32_t addr, int len, uint32_t data);
+
+    Flash(char* ImgFile);
 
 };
 #endif

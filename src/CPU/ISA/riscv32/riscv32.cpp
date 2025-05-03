@@ -69,9 +69,9 @@ void riscv32::restart()
     /* The zero register is always 0. */
     CPU_State.gpr[0] = 0;
 
-    // this->pc = 0x80000000;
-    // this->dnpc = 0x80000004;
-    // this->snpc = 0x80000004;
+    this->pc = RESET_VECTOR;
+    this->dnpc = RESET_VECTOR+4;
+    this->snpc = RESET_VECTOR+4;
 }
 void riscv32::decode_operand(int *rd, Word_t *src1, Word_t *src2, Word_t *imm, int type)
 {

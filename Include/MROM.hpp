@@ -3,7 +3,7 @@
 #include "BlockDevice.hpp"
 class MROM:public BlockDevice{
     public:
-        MROM();
+        MROM(char* ImgFile);
         void DrviceWrite(uint32_t addr, int len, uint32_t data);
 };
 #endif

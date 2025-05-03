@@ -5,7 +5,7 @@
 #include "BUS.hpp"
 class SOC{
     public:
-        Memory * MemoryObj;
+    
         CPU * CPUObj;
         BUS * BUSObj;
         WEMUState * WEMUStateObj;

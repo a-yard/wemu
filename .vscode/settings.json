@@ -10,6 +10,10 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "mrom.hpp": "c",
+        "characterdevice.hpp": "c",
+        "uart.hpp": "c",
+        "uart.h": "c"
     }
 }

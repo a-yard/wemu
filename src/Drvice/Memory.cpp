@@ -131,3 +131,7 @@ Memory::Memory()
 
 
 
+Memory::Memory(char* ImgFile){
+    Memory();
+    this->load_img(ImgFile);
+}

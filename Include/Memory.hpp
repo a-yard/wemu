@@ -5,6 +5,7 @@ class Memory:public BlockDevice{
 
     public:
         Memory();
+        Memory(char* ImgFile);
 
         
         

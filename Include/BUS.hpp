@@ -10,6 +10,6 @@ class BUS{
     public:
         Word_t BUSRead(VAddr_t RAddr,int len);
         void BUSWirte(VAddr_t WAddr,Word_t WData,int WMask);
-        BUS (Memory * InMemory,WEMUState * InWEMUState);
+        BUS (WEMUState * InWEMUState,char * img_file);
 };
 #endif
