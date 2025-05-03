@@ -4,7 +4,8 @@ C_SRC = $(wemu_HOME)/wemu_main.cpp \
 		$(wemu_HOME)/src/CPU/CPU.cpp \
 		$(wemu_HOME)/src/CPU/ISA/riscv32/riscv32.cpp \
 		$(wemu_HOME)/src/CPU/ISA/ISA.cpp \
-		$(wemu_HOME)/src/Memory/Memory.cpp \
+		$(wemu_HOME)/src/Drvice/Memory.cpp \
+		$(wemu_HOME)/src/Drvice/BlockDevice.cpp \
 		$(wemu_HOME)/src/Monitor/Monitor.cpp \
 		$(wemu_HOME)/src/Monitor/sdb/sdb.cpp \
 		$(wemu_HOME)/src/Monitor/sdb/expr.cpp \

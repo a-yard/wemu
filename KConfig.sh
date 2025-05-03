@@ -36,6 +36,10 @@ echo "#define FLASH_SIZE " $CONFIG_SELECT_CONFIG_FLASH_SIZE >>  "./Include/auto.
 
 echo "#define FLASH_BASE " $CONFIG_SELECT_CONFIG_FLASH_BASE >>  "./Include/auto.h" 
 
+echo "#define MROM_SIZE " $CONFIG_SELECT_CONFIG_MROM_SIZE >>  "./Include/auto.h" 
+
+echo "#define MROM_BASE " $CONFIG_SELECT_CONFIG_MROM_BASE >>  "./Include/auto.h" 
+
 echo "#define UART_SIZE " $CONFIG_SELECT_CONFIG_UART_SIZE >>  "./Include/auto.h" 
 
 echo "#define UART_BASE " $CONFIG_SELECT_CONFIG_UART_BASE >>  "./Include/auto.h" 

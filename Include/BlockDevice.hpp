@@ -12,6 +12,14 @@ protected:
     void host_write(void *addr, int len, uint32_t data);
     uint32_t BlockDeviceBASE;
     uint32_t BlockDeviceSIZE;
+    virtual void out_of_bound(uint32_t addr);
+public:
+    void load_img(char* ImgFile);
+    long img_size;
+    ~BlockDevice();
+    virtual uint32_t DrviceRead(uint32_t addr, int len);
+    virtual void DrviceWrite(uint32_t addr, int len, uint32_t data);
+
 
 };
 

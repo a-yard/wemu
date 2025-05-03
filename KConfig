@@ -27,6 +27,15 @@ config SELECT_CONFIG_SRAM_SIZE
     default 0x01000000                             
 endmenu
 
+menu MROM
+config SELECT_CONFIG_MROM_BASE            
+    hex "MROM BASE"                       
+    default 0x20000000  
+config SELECT_CONFIG_MROM_SIZE           
+    hex "MROM size"                       
+    default 0x1000                           
+endmenu
+
 menu UART
 config SELECT_CONFIG_UART_BASE            
     hex "UART BASE"                       
