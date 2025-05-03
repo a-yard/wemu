@@ -1,4 +1,4 @@
-wemu_HOME = /home/wsp/wemu
+wemu_HOME = /home/wsp/StartLinux/wemu
 C_SRC = $(wemu_HOME)/wemu_main.cpp \
 		$(wemu_HOME)/src/BUS/BUS.cpp \
 		$(wemu_HOME)/src/CPU/CPU.cpp \
@@ -31,4 +31,13 @@ getTest:
 	cp -rf /home/wsp/riscv-tests/isa/rv32* ./test/isa/
 	echo $(rv32uiPTests)
 
-include TestMakefile.mk
+# include TestMakefile.mk
+
+runOpenSpi:
+	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
+	riscv64-unknown-elf-objdump -d  /home/wsp/StartLinux/opensbi/build/platform/generic/firmware/fw_jump.elf > fw_jump.s
+	@./build/wemu   -b   /home/wsp/StartLinux/opensbi/build/platform/generic/firmware/fw_jump.bin
+
+
+makeOpenSBI:
+	make -C /home/wsp/StartLinux/opensbi/  PLATFORM=HaiTang CROSS_COMPILE=riscv64-linux-gnu-  FW_DISASM=y

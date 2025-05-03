@@ -24,6 +24,24 @@ source "$config_file" || exit 1
 
 echo "// Auto Create" > "./Include/auto.h" 
 
-echo "#define MEMORY_SIZE " $CONFIG_SELECT_MEMORY_SIZE >>  "./Include/auto.h" 
+echo "#define MEMORY_SIZE " $CONFIG_SELECT_CONFIG_MEMORY_SIZE >>  "./Include/auto.h" 
 
-echo "#define CONFIG_MBASE " $CONFIG_SELECT_CONFIG_MBASE >>  "./Include/auto.h" 
+echo "#define MEMORY_BASE " $CONFIG_SELECT_CONFIG_MBASE >>  "./Include/auto.h" 
+
+echo "#define SRAM_SIZE " $CONFIG_SELECT_CONFIG_SRAM_SIZE >>  "./Include/auto.h" 
+
+echo "#define SRAM_BASE " $CONFIG_SELECT_CONFIG_SRAM_BASE >>  "./Include/auto.h" 
+
+echo "#define FLASH_SIZE " $CONFIG_SELECT_CONFIG_FLASH_SIZE >>  "./Include/auto.h" 
+
+echo "#define FLASH_BASE " $CONFIG_SELECT_CONFIG_FLASH_BASE >>  "./Include/auto.h" 
+
+echo "#define UART_SIZE " $CONFIG_SELECT_CONFIG_UART_SIZE >>  "./Include/auto.h" 
+
+echo "#define UART_BASE " $CONFIG_SELECT_CONFIG_UART_BASE >>  "./Include/auto.h" 
+
+echo "#define CLINT_SIZE " $CONFIG_SELECT_CONFIG_CLINT_SIZE >>  "./Include/auto.h" 
+
+echo "#define CLINT_BASE " $CONFIG_SELECT_CONFIG_CLINT_BASE >>  "./Include/auto.h" 
+
+echo "#define RESET_VECTOR " $CONFIG_SELECT_CONFIG_PC_INIT >>  "./Include/auto.h" 

@@ -9,7 +9,7 @@ class riscv32_CPU_state{
         // Word_t mstatus; //存放处理器的状态
         // Word_t mcause;  //存放触发异常的原因
         // Word_t mtvec;   //存放异常入口地址
-        Word_t csr[0x1000];
+        Word_t csr[4096];
 };
 
 #endif

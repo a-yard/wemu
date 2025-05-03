@@ -31,5 +31,5 @@ typedef uint32_t Word_t;
 #define ANSI_FMT(str, fmt) fmt str ANSI_NONE
 
 using namespace std;
-#define RESET_VECTOR 0x80000000
+// #define RESET_VECTOR 0x80000000
 #endif

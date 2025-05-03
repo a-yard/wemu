@@ -1,0 +1,18 @@
+#ifndef __BLOCKDEVICE_H__
+#define __BLOCKDEVICE_H__
+#include "Device.hpp"
+
+class BlockDevice : public Device
+{
+protected:
+    uint8_t *PMem;
+    uint8_t *GuestToHost(uint32_t paddr);
+    uint32_t HostToGuest(uint8_t *haddr);
+    uint32_t host_read(void *addr, int len);
+    void host_write(void *addr, int len, uint32_t data);
+    uint32_t BlockDeviceBASE;
+    uint32_t BlockDeviceSIZE;
+
+};
+
+#endif
