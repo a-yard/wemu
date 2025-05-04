@@ -28,6 +28,7 @@ void BUS::BUSWirte(VAddr_t WAddr, Word_t WData, int WMask)
     // }
     BUSLEAFNODEWIRTE(Memory);
     BUSLEAFNODEWIRTE(UART);
+    BUSLEAFNODEWIRTE(CLINT);
     AccessBUSOutOfBound(WAddr);
 }
 

@@ -181,14 +181,14 @@ int riscv32::decode_exec()
     INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = csr(imm);csr(imm)=t &zimm;R(rd)=t);  //note
 
     //M  note
-    INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = src1 * src2);                                                                    
-    INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * ((signed long)(signed)src2)) >> 32)); 
+    INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = (int64_t)(signed)src1 * (int64_t)(signed)src2);                                                                    
+    INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh, R, R(rd) = ((((int64_t)(signed)src1) * ((int64_t)(signed)src2)) >> 32)); 
     INSTPAT("0000001 ????? ????? 010 ????? 01100 11", mulhsu, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * (src2)) >> 32));
     INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu, R, R(rd) = ((((unsigned long)(unsigned)src1) * ((unsigned long)(unsigned)src2)) >> 32));  
-    INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div, R, R(rd) = ((signed)src1 / (signed)src2));                                                  
-    INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu, R, R(rd) = src1 / src2);                                                                   
-    INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem, R, R(rd) = (Word_t)((signed)src1 % (signed)src2));                                          
-    INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R, R(rd) = (Word_t)(src1 % src2));                                                         
+    INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div, R, {if(src2==0)R(rd)=-1; else R(rd) = ((int32_t)src1 == INT32_MIN && (int32_t)src2 == -1)?src1 : ((int32_t)src1/(int32_t)src2) ;} );                                                  
+    INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu, R, R(rd)=(src2==0)?0xffffffff:src1/src2);                                                                   
+    INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem, R,  {if(src2==0)R(rd)=src1; else R(rd) = ((int32_t)src1 == INT32_MIN && (int32_t)src2 == -1)?0 : ((int32_t)src1%(int32_t)src2) ;} );                                          
+    INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R, R(rd) = (src2==0)?src1:src1%src2 );                                                         
     
     //原子指令 note
     INSTPAT("00010?? 00000 ????? 010 ????? 01011 11", lr_w, R, Word_t tmp = this->BUSObj->BUSRead(src1,4);R(rd)=tmp);  
@@ -219,9 +219,9 @@ int riscv32::isa_exec_once()
     this->inst = this->BUSObj->BUSRead(this->pc, 4);
     this->snpc = this->pc + 4;
     // cout << "PC:" << hex << this->pc << ": 0x" << hex << inst << endl;
-
     this->decode_exec();
     this->pc = this->dnpc;
+    this->BUSObj->CLINTObj->AddMtime();
     return 0;
 }
 

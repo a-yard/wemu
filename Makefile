@@ -56,4 +56,4 @@ makeOpenSBI:
 	riscv64-unknown-elf-objdump -D /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.elf > build/fw_jump.s
 
 rundlimage: CreateExec
-	@./build/wemu  -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage
+	@./build/wemu -b -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage
