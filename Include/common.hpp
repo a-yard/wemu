@@ -31,5 +31,15 @@ typedef uint32_t Word_t;
 #define ANSI_FMT(str, fmt) fmt str ANSI_NONE
 
 using namespace std;
+typedef struct {
+    Word_t gpr[32];
+    VAddr_t pc;
+    Word_t mepc;  //存放触发异常的PC
+    Word_t mstatus; //存放处理器的状态
+    Word_t mcause;  //存放触发异常的原因
+    Word_t mtvec;   //存放异常入口地址
+  } riscv32CPUstate;
+  typedef riscv32CPUstate Ref_CPU_state;
+  typedef riscv32CPUstate Dut_CPU_state;
 // #define RESET_VECTOR 0x80000000
 #endif

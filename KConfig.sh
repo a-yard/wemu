@@ -49,3 +49,19 @@ echo "#define CLINT_SIZE " $CONFIG_SELECT_CONFIG_CLINT_SIZE >>  "./Include/auto.
 echo "#define CLINT_BASE " $CONFIG_SELECT_CONFIG_CLINT_BASE >>  "./Include/auto.h" 
 
 echo "#define RESET_VECTOR " $CONFIG_SELECT_CONFIG_PC_INIT >>  "./Include/auto.h" 
+
+echo "#define DEVICE_TREE_ADDR " $CONFIG_SELECT_CONFIG_DEVICETREEADDR >>  "./Include/auto.h" 
+
+echo "#define HART_ID " $CONFIG_SELECT_CONFIG_HART_ID >>  "./Include/auto.h" 
+
+if [ "${CONFIG_SELECT_START_MODE_M:-n}" = "y" ]; then
+    echo "#define START_MODE_M" >>  "./Include/auto.h" 
+fi
+
+if [ "${CONFIG_SELECT_START_MODE_S:-n}" = "y" ]; then
+    echo "#define START_MODE_S" >>  "./Include/auto.h" 
+fi
+
+if [ "${CONFIG_SELECT_START_MODE_U:-n}" = "y" ]; then
+    echo "#define START_MODE_M" >>  "./Include/auto.h" 
+fi

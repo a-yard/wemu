@@ -9,7 +9,7 @@ char *sdb::rl_gets()
     line_read = NULL;
   }
 
-  line_read = readline("HaiTangCPU> ");
+  line_read = readline("wemu> ");
 
   if (line_read && *line_read)
   {

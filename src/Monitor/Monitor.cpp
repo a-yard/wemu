@@ -1,10 +1,12 @@
 #include "../../Include/Monitor.hpp"
 Monitor::Monitor(int argc, char *argv[]){
     this->parse_args(argc,argv);
+    printf("%s\n\n",this->dtb_file);
     this->WEMUStateObj = new WEMUState();
-    printf("%s",this->img_file);
-    this->SOCObj = new SOC(WEMUStateObj,this->img_file);
+
+    this->SOCObj = new SOC(WEMUStateObj,this->img_file,this->dtb_file);
     this->sdbObj = new sdb(SOCObj->BUSObj,SOCObj->CPUObj);
+    this->welcome();
     this->sdbObj->sdb_mainloop();
 }
 
@@ -26,7 +28,7 @@ int Monitor::parse_args(int argc, char *argv[])
           {0, 0, NULL, 0},
       };
       int o;
-      while ((o = getopt_long(argc, argv, "-bhl:d:p:e:", table, NULL)) != -1)
+      while ((o = getopt_long(argc, argv, "-bhl:d:p:t:e", table, NULL)) != -1)
       {
           switch (o)
           {
@@ -40,6 +42,9 @@ int Monitor::parse_args(int argc, char *argv[])
               break;
           case 'e':
               elf_file = optarg;
+              break;
+          case 't':
+              dtb_file = optarg;
               break;
           case 1:
               img_file = optarg;
@@ -56,3 +61,8 @@ int Monitor::parse_args(int argc, char *argv[])
       }
       return 0;
   }
+
+  void Monitor::welcome(){
+    printf("\033[0m\033[1;32m%s\033[0m", "Welcome to riscv32e-wemu!\n");
+    printf("\033[0m\033[1;32m%s\033[0m","For help, type \"help\"\n\n");
+}

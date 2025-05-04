@@ -60,4 +60,34 @@ menu WEMU
 config SELECT_CONFIG_PC_INIT
     hex "PC init value"                       
     default 0x80000000   
+config SELECT_CONFIG_DEVICETREEADDR
+    hex "Device Tree addr"                       
+    default 0x20000000
+
+
+config SELECT_CONFIG_HART_ID
+    hex "select Hart ID"                       
+    default 0x0
+
+
+choice SELECT_START_MODE                      
+    prompt "Select start mode"                
+    default SELECT_START_MODE_M                     
+ 
+config SELECT_START_MODE_M                      
+    bool "M"
+config SELECT_START_MODE_S                      
+    bool "S"
+config SELECT_START_MODE_U                      
+    bool "U"
+
+endchoice
+
+endmenu
+
+menu Debug
+config PRINTF_EXEC_INSTR_COUNT     
+    bool "printf exec instr count"          
+    default n
+ 
 endmenu

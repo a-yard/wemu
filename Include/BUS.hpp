@@ -3,6 +3,9 @@
 #include "Memory.hpp"
 #include "WEMUState.hpp"
 #include "UART.h"
+#include "MROM.hpp"
+#include "CLINT.h"
+
 #define BUSLEAFNODEREAD(DeviceName) \
 { \
 uint32_t DeviceNameAddrHead = DeviceName ## _BASE; \
@@ -17,7 +20,7 @@ if(RAddr>=DeviceNameAddrHead&&RAddr<=DeviceNameAddrTail){\
 uint32_t DeviceNameAddrHead = DeviceName ## _BASE; \
 uint32_t DeviceNameAddrTail = DeviceNameAddrHead+ DeviceName ## _SIZE; \
 if(WAddr>=DeviceNameAddrHead&&WAddr<=DeviceNameAddrTail){\
-        this->MemoryObj->DrviceWrite(WAddr, WData, WMask); \
+        this->DeviceName ## Obj->DrviceWrite(WAddr,  WMask,WData); \
         return;\
     } \
 }
@@ -25,14 +28,18 @@ if(WAddr>=DeviceNameAddrHead&&WAddr<=DeviceNameAddrTail){\
 
 class BUS{
     private:
-        Memory * MemoryObj;
+        
         WEMUState * WEMUStateObj;
-        UART *UARTObj ;
+        
         void AccessBUSOutOfBound(VAddr_t addr);
 
     public:
+        UART *UARTObj ;
+        Memory * MemoryObj;
+        MROM * MROMObj;
+        CLINT * CLINTObj;
         Word_t BUSRead(VAddr_t RAddr,int len);
         void BUSWirte(VAddr_t WAddr,Word_t WData,int WMask);
-        BUS (WEMUState * InWEMUState,char * img_file);
+        BUS (WEMUState * InWEMUState,char * img_file,char * dtb_file);
 };
 #endif

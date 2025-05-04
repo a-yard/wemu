@@ -9,7 +9,7 @@ class SOC{
         CPU * CPUObj;
         BUS * BUSObj;
         WEMUState * WEMUStateObj;
-        SOC(WEMUState * InWEMUState,char * img_file);
+        SOC(WEMUState * InWEMUState,char * img_file,char * dtb_file);
         
 };
 

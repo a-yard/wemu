@@ -1,16 +1,10 @@
-#ifndef __MyUART_H__
-#define __MyUART_H__
-
+#ifndef __CLINT_H__
+#define __CLINT_H__
 #include "CharacterDevice.hpp"
-// 
-
-class UART : public CharacterDevice{
-    private:
-        uint8_t UartReg[8];
+class CLINT:public CharacterDevice{
     public:
-        UART();
+        CLINT();
         virtual uint32_t DrviceRead(uint32_t addr, int len) ;
         virtual void DrviceWrite(uint32_t addr, int len, uint32_t data) ;
 };
-
 #endif

@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "Memory.hpp"
 #include "BUS.hpp"
+#include "DiffTestDut.hpp"
 class ISA{
     protected:
         BUS * BUSObj;
@@ -12,6 +13,7 @@ class ISA{
         virtual void DesplayCPU_state()=0;
         ISA (BUS * InBUS);
         virtual Word_t Get_gpr(int n)=0;
+        virtual bool isa_difftest_checkregs(Ref_CPU_state *ref_r, VAddr_t pc)=0;
         
 
 };

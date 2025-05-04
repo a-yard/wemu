@@ -15,6 +15,7 @@ private:
     char *img_file;
     char *elf_file;
     char *diff_so_file;
+    char * dtb_file;
     SOC *SOCObj;
     sdb *sdbObj;
     WEMUState *WEMUStateObj;
@@ -24,6 +25,7 @@ public:
     ~Monitor();
     int is_exit_status_bad();
     int parse_args(int argc, char *argv[]);
+    void welcome();
 };
 
 #endif

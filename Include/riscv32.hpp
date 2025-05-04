@@ -67,5 +67,6 @@ public:
     void DesplayCPU_state();
     void PrintfLog();
     Word_t Get_gpr(int n);
+    bool isa_difftest_checkregs(Ref_CPU_state *ref_r, VAddr_t pc);
 };
 #endif

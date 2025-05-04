@@ -132,6 +132,8 @@ Memory::Memory()
 
 
 Memory::Memory(char* ImgFile){
-    Memory();
+    this->BlockDeviceBASE = Memory_BASE;
+    this->BlockDeviceSIZE = Memory_SIZE;
+    this->PMem = (uint8_t *)malloc(BlockDeviceSIZE);
     this->load_img(ImgFile);
 }

@@ -4,6 +4,7 @@ C_SRC = $(wemu_HOME)/wemu_main.cpp \
 		$(wemu_HOME)/src/CPU/CPU.cpp \
 		$(wemu_HOME)/src/CPU/ISA/riscv32/riscv32.cpp \
 		$(wemu_HOME)/src/CPU/ISA/ISA.cpp \
+		$(wemu_HOME)/src/CPU/ISA/DiffTestDut.cpp \
 		$(wemu_HOME)/src/Monitor/Monitor.cpp \
 		$(wemu_HOME)/src/Monitor/sdb/sdb.cpp \
 		$(wemu_HOME)/src/Monitor/sdb/expr.cpp \
@@ -16,6 +17,7 @@ C_SRC = $(wemu_HOME)/wemu_main.cpp \
 		$(wemu_HOME)/src/Drvice/SRAM.cpp \
 		$(wemu_HOME)/src/Drvice/MROM.cpp \
 		$(wemu_HOME)/src/Drvice/UART.cpp \
+		$(wemu_HOME)/src/Drvice/CLINT.cpp \
 
 LIBS  += -lreadline -lhistory
 
@@ -26,12 +28,15 @@ menuconfig:
 	@./KConfig.sh
 	
 GetColCount:
-	@echo "C++ 行数"
-	@find . -type f \( -name "*.cpp" -o -name "*.hpp" \) -exec cat {} + | wc -l
+	@echo "代码 行数"
+	@find . -type f \( -name "*.cpp" -o -name "*.hpp"  -o -name "*.h" -o -name "*.c" \) -exec cat {} + | wc -l
 
-run:
+CreateExec:compileDeviceTree
 	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
-	@./build/wemu   -b   $(IMG) 
+compileDeviceTree:
+	@dtc -I dts -O dtb -o ./build/HaiTang.dtb ./DeviceTree/HaiTang.dts
+run:CreateExec
+	@./build/wemu   -b build/HaiTang.dtb  $(IMG) 
 
 getTest:
 	cp -rf /home/wsp/riscv-tests/isa/rv32* ./test/isa/
@@ -39,11 +44,16 @@ getTest:
 
 # include TestMakefile.mk
 
-runOpenSpi:
-	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
-	riscv64-unknown-elf-objdump -d  /home/wsp/StartLinux/opensbi/build/platform/generic/firmware/fw_jump.elf > fw_jump.s
-	@./build/wemu   -b   /home/wsp/StartLinux/opensbi/build/platform/generic/firmware/fw_jump.bin
+runOpenSpi: CreateExec
+	@./build/wemu  -t ./build/HaiTang.dtb    $(wemu_HOME)/build/fw_jump.bin
 
 
 makeOpenSBI:
 	make -C /home/wsp/StartLinux/opensbi/  PLATFORM=HaiTang CROSS_COMPILE=riscv64-linux-gnu-  FW_DISASM=y
+	cp /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.bin build/fw_jump.bin
+	cp /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.elf build/fw_jump.elf
+	riscv64-unknown-elf-objdump -D -b binary -m riscv:rv32 -M no-aliases ./build/fw_jump.bin > ./build/disassembly.s
+	riscv64-unknown-elf-objdump -D /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.elf > build/fw_jump.s
+
+rundlimage: CreateExec
+	@./build/wemu  -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage

@@ -14,6 +14,9 @@
         "mrom.hpp": "c",
         "characterdevice.hpp": "c",
         "uart.hpp": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "cassert": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     }
 }
