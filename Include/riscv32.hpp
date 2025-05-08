@@ -15,7 +15,10 @@ static inline int check_reg_idx(int idx) {
   }
   
   #define gpr(idx) (CPU_State.gpr[check_reg_idx(idx)])
-  #define csr(idx) (CPU_State.csr[check_csrreg_idx(idx)])
+  #define RCsr(idx) CPU_State.ReadCSR(check_csrreg_idx(idx))
+  #define WCsr(idx,WData) CPU_State.WriteCSR(check_csrreg_idx(idx),WData)
+
+
   static inline const char* reg_name(int idx) {
     extern const char* regs[];
     return regs[check_reg_idx(idx)];
@@ -52,9 +55,8 @@ private:
     void restart();
     void decode_operand( int *rd, Word_t *src1, Word_t *src2, Word_t *imm, int type);
     int decode_exec();
-    VAddr_t pc;
-    VAddr_t snpc; // static next pc
-    VAddr_t dnpc; // dynamic next pc
+
+    
     Word_t inst;
     void set_wemu_state(int state, VAddr_t pc, int halt_ret);
     void invalid_inst(VAddr_t thispc);

@@ -37,7 +37,6 @@ uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
         break;
     }
 
-
     return ReadData;
 }
 void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
@@ -65,7 +64,6 @@ void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
         assert(0);
         break;
     }
-    
 }
 
 void CLINT::UpDataState(){
