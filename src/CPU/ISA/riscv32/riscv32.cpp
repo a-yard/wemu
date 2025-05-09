@@ -175,6 +175,7 @@ int riscv32::decode_exec()
     //fence
     INSTPAT("0000??? ????? 00000 000 00000 00011 11", fence, I, ); 
     INSTPAT("0000000 00000 00000 001 00000 00011 11", fence_i, I, ); 
+    INSTPAT("0001000 00101 00000 000 00000 11100 11", wfi, I, ); 
 
     //csr
     INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,src1);R(rd)=t);

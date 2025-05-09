@@ -1,4 +1,4 @@
-wemu_HOME = /home/wsp/wemu
+wemu_HOME = /home/wsp/StartLinux/wemu
 C_SRC = $(wemu_HOME)/wemu_main.cpp \
 		$(wemu_HOME)/src/BUS/BUS.cpp \
 		$(wemu_HOME)/src/CPU/CPU.cpp \
