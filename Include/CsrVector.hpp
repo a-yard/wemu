@@ -83,7 +83,7 @@ class CsrVector{
             // ADDCSR("timeh",0xC81);
 
             // for(int i=0;i<0x10000;i++){
-            //     ADDCSR("NULL",i,0);
+            //     ADDCSR("NULL",i,0,PrivilegedLevelM,0);
             // }
 
         }

@@ -119,7 +119,7 @@ int riscv32::decode_exec()
     int rd = 0;
     Word_t src1 = 0, src2 = 0, imm = 0,zimm=0;
     zimm = (this->inst<<12)>>27;
-    CPU_State.dnpc = this->CPU_State.pc;
+    CPU_State.dnpc = this->CPU_State.pc+4;
 
     INSTPAT_START();
 
@@ -150,7 +150,7 @@ int riscv32::decode_exec()
     INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu, I, R(rd) = Mr(src1 + SIGNEDEXTENSIONS(imm, 12), 2));
     INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr, I, R(rd) = CPU_State.pc + 4; CPU_State.dnpc = src1 + SIGNEDEXTENSIONS(imm, 12));
 
-    INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I,CPU_State.dnpc=RCsr(0x305); WCsr(0x341,CPU_State.pc);WCsr(0x342,11));//note
+    INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I,CPU_State.dnpc=RCsr(0x305); WCsr(0x341,CPU_State.pc);Word_t PrivilegedMode = (RCsr(0x300)&0x1800)>>11;if(PrivilegedMode==3)WCsr(0x342,11); else if(PrivilegedMode==1|PrivilegedMode==2)WCsr(0x342,9); else WCsr(0x342,8);  );//note
     INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = RCsr(0x341); ); // cpu.mcause= 8;  //note
     
     INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb, S, Mw(src1 + (SIGNEDEXTENSIONS(imm, 12)),  src2,1));
@@ -212,6 +212,15 @@ int riscv32::decode_exec()
     INSTPAT_END();
 
     R(0) = 0; // reset $zero to 0
+ 
+    if((this->CPU_State.ReadCSR(0x344)&(1<<7))&(this->CPU_State.ReadCSR(0x304)&(1<<7))&(this->CPU_State.ReadCSR(0x300)&(1<<8))){
+        if(this->BUSObj->CLINTObj->DrviceRead(0x2000000,4)){
+            this->CPU_State.WriteCSR(0x341,this->CPU_State.pc);
+            this->CPU_State.WriteCSR(0x342,0x80000007);
+            this->CPU_State.dnpc = this->CPU_State.ReadCSR(0x305);
+            this->BUSObj->CLINTObj->DrviceWrite(0x2000000,4,0);
+        }
+    }
 
     return 0;
 }
@@ -220,8 +229,7 @@ int riscv32::isa_exec_once()
 {
 
     this->inst = this->BUSObj->BUSRead(this->CPU_State.pc, 4);
-    cout << "PC:" << hex << this->CPU_State.pc << ": 0x" << hex << inst << endl;
-    this->CPU_State.pc+=4;
+    // cout << "PC:" << hex << this->CPU_State.pc << ": 0x" << hex << inst << endl;
     this->decode_exec();
     this->CPU_State.pc = CPU_State.dnpc;
     this->BUSObj->CLINTObj->AddMtime();
