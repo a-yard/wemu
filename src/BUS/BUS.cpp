@@ -21,11 +21,11 @@ Word_t BUS::BUSRead(VAddr_t RAddr, int len)
 }
 void BUS::BUSWirte(VAddr_t WAddr, Word_t WData, int WMask)
 {
-    // if (WAddr == 0x80001000)
-    // {
-    //     this->WEMUStateObj->state = WEMU_END;
-    //     printf("--%d--\n", WData);
-    // }
+    if (WAddr == 0x80001000)
+    {
+        this->WEMUStateObj->state = WEMU_END;
+        printf("--%d--\n", WData);
+    }
     BUSLEAFNODEWIRTE(Memory);
     BUSLEAFNODEWIRTE(UART);
     BUSLEAFNODEWIRTE(CLINT);

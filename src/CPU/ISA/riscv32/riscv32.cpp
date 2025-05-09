@@ -76,6 +76,7 @@ void riscv32::restart()
 
     this->CPU_State.pc = RESET_VECTOR;
     CPU_State.dnpc = RESET_VECTOR+4;
+    this->CPU_State.trap=0;
 
 }
 void riscv32::decode_operand(int *rd, Word_t *src1, Word_t *src2, Word_t *imm, int type)
@@ -169,19 +170,19 @@ int riscv32::decode_exec()
 
     INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal, J, R(rd) = CPU_State.pc + 4; CPU_State.dnpc = CPU_State.pc + SIGNEDEXTENSIONS(imm, 21)); // rd默认为x1
 
-    INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N, set_wemu_state(WEMU_END, CPU_State.pc, R(10))); // R(10) is $a0
+    INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N, WCsr(0x342,3);WCsr(0x305,this->CPU_State.pc)); // R(10) is $a0
 
     //fence
     INSTPAT("0000??? ????? 00000 000 00000 00011 11", fence, I, ); 
     INSTPAT("0000000 00000 00000 001 00000 00011 11", fence_i, I, ); 
 
     //csr
-    INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t = RCsr(imm);WCsr(imm,src1);R(rd)=t);
-    INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = RCsr(imm);WCsr(imm,src1 | t);R(rd)=t);
-    INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = RCsr(imm);WCsr(imm,src1 & t);R(rd)=t);
-    INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t = RCsr(imm);WCsr(imm,zimm);R(rd)=t);     //note
-    INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = RCsr(imm);WCsr(imm,t |zimm);R(rd)=t);  //note
-    INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = RCsr(imm);WCsr(imm,t &zimm);R(rd)=t);  //note
+    INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,src1);R(rd)=t);
+    INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,src1 | t);R(rd)=t );
+    INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,src1 & t);R(rd)=t);
+    INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,zimm);R(rd)=t);     //note
+    INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,t |zimm);R(rd)=t);  //note
+    INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = RCsr(imm&0xfff);WCsr(imm&0xfff,t &zimm);R(rd)=t);  //note
 
     //M  note
     INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = (int64_t)(signed)src1 * (int64_t)(signed)src2);                                                                    
@@ -213,13 +214,24 @@ int riscv32::decode_exec()
 
     R(0) = 0; // reset $zero to 0
  
-    if((this->CPU_State.ReadCSR(0x344)&(1<<7))&(this->CPU_State.ReadCSR(0x304)&(1<<7))&(this->CPU_State.ReadCSR(0x300)&(1<<8))){
-        if(this->BUSObj->CLINTObj->DrviceRead(0x2000000,4)){
+     // if((this->CPU_State.ReadCSR(0x344)&(1<<7))&(this->CPU_State.ReadCSR(0x304)&(1<<7))&(this->CPU_State.ReadCSR(0x300)&(1<<8))){
+    //     if(this->BUSObj->CLINTObj->DrviceRead(0x2000000,4)){
+    //         this->CPU_State.WriteCSR(0x341,this->CPU_State.pc);
+    //         this->CPU_State.WriteCSR(0x342,0x80000007);
+    //         this->CPU_State.dnpc = this->CPU_State.ReadCSR(0x305);
+    //         this->BUSObj->CLINTObj->DrviceWrite(0x2000000,4,0);
+    //     }
+    // }
+    if(this->CPU_State.trap){
+        if(this->CPU_State.trap&0x80000000){
+
+        } else {
+            printf("trap = %x next = %x\n",this->CPU_State.trap,this->CPU_State.ReadCSR(0x305));
             this->CPU_State.WriteCSR(0x341,this->CPU_State.pc);
-            this->CPU_State.WriteCSR(0x342,0x80000007);
+            this->CPU_State.WriteCSR(0x342,this->CPU_State.trap);
             this->CPU_State.dnpc = this->CPU_State.ReadCSR(0x305);
-            this->BUSObj->CLINTObj->DrviceWrite(0x2000000,4,0);
         }
+        this->CPU_State.trap=0;
     }
 
     return 0;
@@ -229,7 +241,7 @@ int riscv32::isa_exec_once()
 {
 
     this->inst = this->BUSObj->BUSRead(this->CPU_State.pc, 4);
-    // cout << "PC:" << hex << this->CPU_State.pc << ": 0x" << hex << inst << endl;
+    cout << "PC:" << hex << this->CPU_State.pc << ": 0x" << hex << inst << endl;
     this->decode_exec();
     this->CPU_State.pc = CPU_State.dnpc;
     this->BUSObj->CLINTObj->AddMtime();

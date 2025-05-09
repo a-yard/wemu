@@ -1,4 +1,4 @@
-wemu_HOME = /home/wsp/StartLinux/wemu
+wemu_HOME = /home/wsp/wemu
 C_SRC = $(wemu_HOME)/wemu_main.cpp \
 		$(wemu_HOME)/src/BUS/BUS.cpp \
 		$(wemu_HOME)/src/CPU/CPU.cpp \
@@ -31,12 +31,12 @@ GetColCount:
 	@echo "代码 行数"
 	@find . -type f \( -name "*.cpp" -o -name "*.hpp"  -o -name "*.h" -o -name "*.c" \) -exec cat {} + | wc -l
 
-CreateExec:compileDeviceTree
+CreateExec:
 	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
 compileDeviceTree:
 	@dtc -I dts -O dtb -o ./build/HaiTang.dtb ./DeviceTree/HaiTang.dts
 run:CreateExec
-	@./build/wemu   -b build/HaiTang.dtb  $(IMG) 
+	@./build/wemu  -t  build/HaiTang.dtb  $(IMG) 
 
 getTest:
 	cp -rf /home/wsp/riscv-tests/isa/rv32* ./test/isa/
@@ -57,3 +57,12 @@ makeOpenSBI:
 
 rundlimage: CreateExec
 	@./build/wemu -b -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage
+
+include TestMakefile.mk
+
+runtest:CreateExec
+	cp ./test/isa/$(name).dump .
+	riscv64-unknown-elf-objcopy -O binary ./test/isa/$(name) $(name).bin
+	@./build/wemu  -t ./build/HaiTang.dtb    $(name).bin
+	@rm $(name).bin
+	@rm $(name).dump

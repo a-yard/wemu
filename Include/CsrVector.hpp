@@ -1,7 +1,7 @@
 #ifndef __CSR_T_H__
 #define __CSR_T_H__
 #include "common.hpp"
-enum PrivilegedLevel{
+enum PrivilegedLevelenum{
     PrivilegedLevelU=0,
     PrivilegedLevelS,
     PrivilegedLevelH,
@@ -9,7 +9,7 @@ enum PrivilegedLevel{
     
 };
 
-enum RWPermission{
+enum RWPermissionenum{
     RWPermissionRW=0,
     RWPermissionRO=3
     
@@ -29,11 +29,14 @@ class CSR_T
 
 
 
-#define ADDCSR(csrname,csrn,RWPermission,PrivilegedLevel,InitVaalue) \
+#define ADDCSR(csrname,csrn,inRWPermission,inPrivilegedLevel,inInitValue) \
     CSR_T CSR_T__##csrn; \
     CSR_T__##csrn.CsrNumber = csrn; \
     CSR_T__##csrn.CsrName = csrname; \
-    csrvector.push_back(CSR_T__##csrn)
+    CSR_T__##csrn.Reg = inInitValue; \
+    CSR_T__##csrn.PrivilegedLevel = inPrivilegedLevel ;\
+    CSR_T__##csrn.RWPermission = inRWPermission ;\
+    csrvector.push_back(CSR_T__##csrn);
     // Word_t cycle;   //cycle 计数器记录自处理器启动以来的时钟周期数  0xc00
 	// Word_t cycleh;  //0xc80
 
@@ -59,7 +62,7 @@ class CsrVector{
             ADDCSR("misa",0x301,RWPermissionRW,PrivilegedLevelM,0b01000010000000100000000000000000);//User mode implemented  Supervisor mode implemented
             ADDCSR("mvendorid",0xF11,RWPermissionRO,PrivilegedLevelM,0);  //表示非商业实现
             ADDCSR("marchid",0xF12,RWPermissionRO,PrivilegedLevelM,0);  //商业体系结构id
-            ADDCSR("mimpid",0xF13,RWPermissionRO,PrivilegedLevelM,1); //处理器实现版本
+            ADDCSR("mimpid",0xF13,RWPermissionRO,PrivilegedLevelM,0); //处理器实现版本
             ADDCSR("mhartid",0xF14,RWPermissionRO,PrivilegedLevelM,0); //运行代码的硬件线程的整数 ID
 
             ADDCSR("mstatus",0x300,RWPermissionRW,PrivilegedLevelM,(0x3<<11)); //机器状态寄存器      note
