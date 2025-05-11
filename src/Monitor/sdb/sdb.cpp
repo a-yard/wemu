@@ -44,7 +44,9 @@ int sdb::cmd_info(char *args)
 {
   char *str = strtok(NULL, " ");
   if (strcmp(str, "r") == 0)
-    this->CPUObj->ISAObj->DesplayCPU_state();
+    this->CPUObj->ISAObj->DesplayReg();
+    else if (strcmp(str, "csr") == 0)
+    this->CPUObj->ISAObj->DesplayCSR();
   else if (strcmp(str, "w") == 0)
     this->watchpointObj->displaywatch();
   else

@@ -66,9 +66,10 @@ public:
     riscv32(WEMUState *InWEMUState,BUS * InBUS);
     VAddr_t Get_PC();
     int isa_exec_once();
-    void DesplayCPU_state();
+    void DesplayReg();
     void PrintfLog();
     Word_t Get_gpr(int n);
     bool isa_difftest_checkregs(Ref_CPU_state *ref_r, VAddr_t pc);
+    void DesplayCSR();
 };
 #endif

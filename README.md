@@ -5,3 +5,8 @@
 ## 安装kconfig-frontends
 ```
 apt install kconfig-frontends
+```
+## 编译设备树工具安装
+```
+apt install device-tree-compiler
+```

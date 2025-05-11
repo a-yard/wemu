@@ -31,7 +31,7 @@ GetColCount:
 	@echo "代码 行数"
 	@find . -type f \( -name "*.cpp" -o -name "*.hpp"  -o -name "*.h" -o -name "*.c" \) -exec cat {} + | wc -l
 
-CreateExec:
+CreateExec:compileDeviceTree
 	@g++ -w  $(C_SRC) -o $(wemu_HOME)/build/wemu $(LIBS)
 compileDeviceTree:
 	@dtc -I dts -O dtb -o ./build/HaiTang.dtb ./DeviceTree/HaiTang.dts
@@ -44,7 +44,7 @@ getTest:
 
 # include TestMakefile.mk
 
-runOpenSpi: CreateExec
+runOpenSpi: CreateExec compileDeviceTree
 	@./build/wemu  -t ./build/HaiTang.dtb    $(wemu_HOME)/build/fw_jump.bin
 
 
@@ -52,13 +52,13 @@ makeOpenSBI:
 	make -C /home/wsp/StartLinux/opensbi/  PLATFORM=HaiTang CROSS_COMPILE=riscv64-linux-gnu-  FW_DISASM=y
 	cp /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.bin build/fw_jump.bin
 	cp /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.elf build/fw_jump.elf
-	riscv64-unknown-elf-objdump -D -b binary -m riscv:rv32 -M no-aliases ./build/fw_jump.bin > ./build/disassembly.s
-	riscv64-unknown-elf-objdump -D /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.elf > build/fw_jump.s
+	/opt/riscv/bin/riscv64-unknown-elf-objdump -D /home/wsp/StartLinux/opensbi/build/platform/HaiTang/firmware/fw_jump.elf > build/fw_jump.s
+	
 
 rundlimage: CreateExec
 	@./build/wemu -b -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage
 
-include TestMakefile.mk
+# include TestMakefile.mk
 
 runtest:CreateExec
 	cp ./test/isa/$(name).dump .
@@ -66,3 +66,19 @@ runtest:CreateExec
 	@./build/wemu  -t ./build/HaiTang.dtb    $(name).bin
 	@rm $(name).bin
 	@rm $(name).dump
+
+
+clean:
+	@rm -rf ../opensbi/build
+	@rm build/disassembly.s
+	@rm build/fw_jump.bin
+	@rm build/fw_jump*
+qemu:
+	qemu-system-riscv32 -M virt -smp 4 -m 4G -bios ../opensbi/build/platform/HaiTang/firmware/fw_jump.bin -kernel build/DownloadedImage -display none -serial stdio -s -S
+gdb:
+	/opt/riscv/bin/riscv64-unknown-elf-gdb ../opensbi/build/platform/HaiTang/firmware/fw_jump.bin
+makeqemu:
+	make -C /home/wsp/StartLinux/opensbi/  CROSS_COMPILE=riscv64-linux-gnu-  PLATFORM=generic
+
+get:
+	cp /home/wsp/StartLinux/mini-rv32ima/mini-rv32ima/mini-rv32ima .

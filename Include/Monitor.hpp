@@ -16,6 +16,7 @@ private:
     char *elf_file;
     char *diff_so_file;
     char * dtb_file;
+    char * Kernal_file;
     SOC *SOCObj;
     sdb *sdbObj;
     WEMUState *WEMUStateObj;

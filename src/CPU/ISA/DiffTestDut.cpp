@@ -86,7 +86,7 @@ void DiffTestDut::difftest_skip_ref() {
     if (!ISAObj->isa_difftest_checkregs(ref, pc)) {
         WEMUStateObj->state = WEMU_ABORT;
         WEMUStateObj->halt_pc = pc;
-        this->ISAObj->DesplayCPU_state();
+        this->ISAObj->DesplayReg();
     }
   }
 

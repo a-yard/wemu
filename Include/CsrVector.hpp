@@ -27,7 +27,15 @@ class CSR_T
        
 } ;
 
-
+#define mstatusAddr 0x300
+#define mtvecAddr 0x305
+#define mipAddr 0x344
+#define mieAddr 0x304
+#define mepcAddr 0x341
+#define mcauseAddr 0x342
+#define mtvalAddr 0x343
+#define cycleAddr 0xC00
+#define cyclehAddr 0xc80
 
 #define ADDCSR(csrname,csrn,inRWPermission,inPrivilegedLevel,inInitValue) \
     CSR_T CSR_T__##csrn; \
@@ -44,29 +52,33 @@ class CSR_T
 	// Word_t timeh; //timeh 存储的是定时器 time 寄存器的高 32 位  0xC81
 
 class CsrVector{
-    private:
-        vector<CSR_T> csrvector;
+    // private:
+        
     public:
-        string CsrName;
-        int CsrNuber;
+        vector<CSR_T> csrvector;
         
-        CSR_T & operator[](int index) {
-            for(int i=1;i<this->csrvector.size();i++){
-                if(index==csrvector[i].CsrNumber)return csrvector[i];
-            }
-            return csrvector[0];
-        }
-        
+        // CSR_T & operator[](int index) {
+        //     for(int i=1;i<this->csrvector.size();i++){
+        //         if(index==csrvector[i].CsrNumber)return csrvector[i];
+        //     }
+        //     return csrvector[0];
+        // }
+        // Word_t ReadCsr(Word_t CsrId){
+        //     for(int i=1;i<this->csrvector.size();i++){
+        //         if(CsrId==csrvector[i].CsrNumber)return csrvector[i].Reg;
+        //     }
+        // }
+
         CsrVector (){
             ADDCSR("NULL",4096,0,0,0);
-            ADDCSR("misa",0x301,RWPermissionRW,PrivilegedLevelM,0b01000010000000100000000000000000);//User mode implemented  Supervisor mode implemented
-            ADDCSR("mvendorid",0xF11,RWPermissionRO,PrivilegedLevelM,0);  //表示非商业实现
+            ADDCSR("misa",0x301,RWPermissionRW,PrivilegedLevelM,0x40400001);//
+            ADDCSR("mvendorid",0xF11,RWPermissionRO,PrivilegedLevelM,0xff0ff0ff);  //表示非商业实现
             ADDCSR("marchid",0xF12,RWPermissionRO,PrivilegedLevelM,0);  //商业体系结构id
             ADDCSR("mimpid",0xF13,RWPermissionRO,PrivilegedLevelM,0); //处理器实现版本
             ADDCSR("mhartid",0xF14,RWPermissionRO,PrivilegedLevelM,0); //运行代码的硬件线程的整数 ID
 
-            ADDCSR("mstatus",0x300,RWPermissionRW,PrivilegedLevelM,(0x3<<11)); //机器状态寄存器      note
-            // ADDCSR("mstatush",0x310,RWPermissionRW,PrivilegedLevelM,0); //机器状态寄存器      note
+            ADDCSR("mstatus",0x300,RWPermissionRW,PrivilegedLevelM,0x1800); //机器状态寄存器      
+            ADDCSR("mstatush",0x310,RWPermissionRW,PrivilegedLevelM,0); //机器状态寄存器      
             ADDCSR("mtvec",0x305,RWPermissionRW,PrivilegedLevelM,0); //机器陷阱向量基地址寄存器      
             ADDCSR("mip",0x344,RWPermissionRW,PrivilegedLevelM,0); //机器中断挂起。
             ADDCSR("mie",0x304,RWPermissionRW,PrivilegedLevelM,0); //机器中断使能寄存器    
@@ -74,21 +86,21 @@ class CsrVector{
             ADDCSR("mepc",0x341,RWPermissionRW,PrivilegedLevelM,0); //机器异常程序计数器
             ADDCSR("mcause",0x342,RWPermissionRW,PrivilegedLevelM,0); //机器成因寄存器
             ADDCSR("mtval",0x343,RWPermissionRW,PrivilegedLevelM,0); //机器错误地址或指令
+            // ADDCSR("cycle",0xC00,RWPermissionRO,PrivilegedLevelU,0); //RDCYCLE 指令的时钟周期计数器低32位
+            // ADDCSR("cycleh",0xC80,RWPermissionRO,PrivilegedLevelU,0); //RDCYCLE 指令的时钟周期计数器高32位
 
-
-
-
-        
+            // ADDCSR("pmpaddr0",0x3b0,RWPermissionRW,PrivilegedLevelM,0); 
+            // ADDCSR("pmpcfg0",0x3a0,RWPermissionRW,PrivilegedLevelM,0); 
     
-            // ADDCSR("cycle",0xc00);
-            // ADDCSR("cycleh",0xc80);
+
             // ADDCSR("time",0xC01);
             // ADDCSR("timeh",0xC81);
 
-            // for(int i=0;i<0x10000;i++){
-            //     ADDCSR("NULL",i,0,PrivilegedLevelM,0);
-            // }
-
+        }
+        void DisplayCsr(){
+            for(int i =0;i<this->csrvector.size();i++){
+                printf("%s = %x\n",csrvector[i].CsrName.c_str(),csrvector[i].Reg);
+            }
         }
 };
 #endif

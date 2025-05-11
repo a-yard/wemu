@@ -8,11 +8,16 @@ CLINT::CLINT(){
     this->mtimeH=0;
     this->mtimeL=0;
     this->msip=0;
+    time_t timep;
+    time(&timep);
+    // 强制转换为 64 位无符号整数（确保兼容性）
+    uint64_t time_val = (uint64_t)timep;
+    this->StartTime = time_val;
 }
 
 uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
     UpDataState();
-    // printf("\nread addr = %x\n",addr);
+    
     uint32_t ReadData=-1;
     switch (addr&0x10000)
     {
@@ -29,18 +34,18 @@ uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
         ReadData=this->mtimecmpH;
         break;
     case 0:
-        printf("read msip :%x\n",msip);
         ReadData=this->msip;
         break;
     default:
         assert(0);
         break;
     }
+    // printf("\nread addr = %x data = %x\n",addr,ReadData);
 
     return ReadData;
 }
 void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
-    // printf("\nWrite addr = %x\n",addr);
+    // printf("\n  CLINT Write addr = %x  wdata = %x\n",addr,data);
     switch (addr)
     {
     case 0X200BFF8:
@@ -56,7 +61,7 @@ void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
         this->mtimecmpH=data;
         return;
     case 0x2000000:
-        printf("w msip %x\n",data);
+        
         this->msip = data;
         return;
     default:
@@ -67,13 +72,14 @@ void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
 }
 
 void CLINT::UpDataState(){
-    // time_t timep;
-    // time(&timep);
-    // // 强制转换为 64 位无符号整数（确保兼容性）
-    // uint64_t time_val = (uint64_t)timep;
-    // // 提取高 32 位和低 32 位
-    // this->mtimeH = (uint32_t)(time_val >> 32); // 右移 32 位取高 32 位
-    // this->mtimeL  = (uint32_t)(time_val & 0xFFFFFFFF); // 掩码取低 32 位
+    time_t timep;
+    time(&timep);
+    // 强制转换为 64 位无符号整数（确保兼容性）
+    uint64_t time_val = (uint64_t)timep;
+    // 提取高 32 位和低 32 位
+    this->mtimeH = (uint32_t)((time_val-StartTime) >> 32); // 右移 32 位取高 32 位
+    this->mtimeL  = (uint32_t)((time_val-StartTime) & 0xFFFFFFFF); // 掩码取低 32 位
+
     uint64_t mtime = ((uint64_t)this->mtimeH)<<32+this->mtimeL;
     uint64_t mtimecmp = ((uint64_t)this->mtimecmpH)<<32+this->mtimecmpL;
     if(	mtime >= mtimecmp){
@@ -81,11 +87,7 @@ void CLINT::UpDataState(){
     }
 }
 
-void CLINT::AddMtime(){
-    this->mtimeL+=1;
-    if(this->mtimeL==0xffffffff){
-        this->mtimeH++;
-        this->mtimeL=0;
-    }
-}
+
+
+
 
