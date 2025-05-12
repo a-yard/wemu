@@ -62,11 +62,11 @@ public:
     {
         
       
-        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel >= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
+        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel <= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
             return csr.csrvector[GetCsrId(CSRNumber)].Reg;
         else
         {
-            printf("rerrorcsr(%s) 0x%x\n", csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
+            printf("CurrentPrivilegeMode = %x  rerrorcsr(%s) 0x%x\n",this->CurrentPrivilegeMode,csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
             trap = 0x2;
         }
         return 0;
@@ -77,14 +77,42 @@ public:
 
         if (WData == csr.csrvector[GetCsrId(CSRNumber)].Reg & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
             return;
-        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel >= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL" & csr.csrvector[GetCsrId(CSRNumber)].RWPermission < 3)
+        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel <= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL" & csr.csrvector[GetCsrId(CSRNumber)].RWPermission < 3)
         {
             csr.csrvector[GetCsrId(CSRNumber)].Reg = WData;
         }
         else
         {
-            printf("werrorcsr(%s) 0x%x\n", csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
+            printf("CurrentPrivilegeMode = %x   werrorcsr(%s) 0x%x\n",this->CurrentPrivilegeMode, csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
             trap = 0x2;
+        }
+    }
+
+    Word_t MReadCSR(Word_t CSRNumber)
+    {
+        
+      
+        if ( csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
+            return csr.csrvector[GetCsrId(CSRNumber)].Reg;
+        else
+        {
+            assert(0);
+        }
+        return 0;
+    }
+
+    void MWriteCSR(Word_t CSRNumber, Word_t WData)
+    {
+
+        if (WData == csr.csrvector[GetCsrId(CSRNumber)].Reg & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
+            return;
+        if ( csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL" & csr.csrvector[GetCsrId(CSRNumber)].RWPermission < 3)
+        {
+            csr.csrvector[GetCsrId(CSRNumber)].Reg = WData;
+        }
+        else
+        {
+            assert(0);
         }
     }
 
@@ -100,6 +128,8 @@ public:
     void DisPlayCsr()
     {
         this->csr.DisplayCsr();
+        printf("CurrentPrivilegeMode %x\n",this->CurrentPrivilegeMode);
+        printf("trap %x\n",this->trap);
     }
     void DisPlayReg()
     {

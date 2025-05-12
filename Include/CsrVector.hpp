@@ -77,7 +77,7 @@ class CsrVector{
             ADDCSR("mimpid",0xF13,RWPermissionRO,PrivilegedLevelM,0); //处理器实现版本
             ADDCSR("mhartid",0xF14,RWPermissionRO,PrivilegedLevelM,0); //运行代码的硬件线程的整数 ID
 
-            ADDCSR("mstatus",0x300,RWPermissionRW,PrivilegedLevelM,0); //机器状态寄存器      
+            ADDCSR("mstatus",0x300,RWPermissionRW,PrivilegedLevelM,0x1800); //机器状态寄存器      
             ADDCSR("mstatush",0x310,RWPermissionRW,PrivilegedLevelM,0); //机器状态寄存器      
             ADDCSR("mtvec",0x305,RWPermissionRW,PrivilegedLevelM,0); //机器陷阱向量基地址寄存器      
             ADDCSR("mip",0x344,RWPermissionRW,PrivilegedLevelM,0); //机器中断挂起。
@@ -91,6 +91,22 @@ class CsrVector{
 
             ADDCSR("pmpaddr0",0x3b0,RWPermissionRW,PrivilegedLevelM,0); 
             ADDCSR("pmpcfg0",0x3a0,RWPermissionRW,PrivilegedLevelM,0); 
+
+            //riscv-test
+            ADDCSR("satp",0x180 ,RWPermissionRW,PrivilegedLevelS,0); //监管级地址转换和保护。
+            ADDCSR("medeleg",0x302 ,RWPermissionRW,PrivilegedLevelM,0); //机器异常代理寄存器。
+            ADDCSR("mideleg",0x303 ,RWPermissionRW,PrivilegedLevelM,0); //机器异常代理寄存器。
+
+            //系统调试预留
+            ADDCSR("debug",0x744 ,RWPermissionRW,PrivilegedLevelU,0); 
+            ADDCSR("debug1",0x7a0 ,RWPermissionRW,PrivilegedLevelU,0); 
+            ADDCSR("debug2",0x7a1 ,RWPermissionRW,PrivilegedLevelU,0); 
+            ADDCSR("debug3",0x7a2 ,RWPermissionRW,PrivilegedLevelU,0); 
+            ADDCSR("debug4",0x7a3 ,RWPermissionRW,PrivilegedLevelU,0); 
+            ADDCSR("debug5",0x7a4 ,RWPermissionRW,PrivilegedLevelU,0); 
+            ADDCSR("debug6",0x7a5 ,RWPermissionRW,PrivilegedLevelU,0); 
+   
+            
 
         }
         void DisplayCsr(){

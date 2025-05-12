@@ -58,12 +58,12 @@ makeOpenSBI:
 rundlimage: CreateExec
 	@./build/wemu -b -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage
 
-# include TestMakefile.mk
+include TestMakefile.mk
 
 runtest:CreateExec
-	cp ./test/isa/$(name).dump .
-	riscv64-unknown-elf-objcopy -O binary ./test/isa/$(name) $(name).bin
-	@./build/wemu  -t ./build/HaiTang.dtb    $(name).bin
+	cp ./test/$(name).dump .
+	riscv64-unknown-elf-objcopy -O binary ./test/$(name) $(name).bin
+	@./build/wemu -b -t ./build/HaiTang.dtb    $(name).bin
 	@rm $(name).bin
 	@rm $(name).dump
 

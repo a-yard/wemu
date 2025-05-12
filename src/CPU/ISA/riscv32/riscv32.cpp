@@ -116,18 +116,17 @@ void riscv32::decode_operand(int *rd, Word_t *src1, Word_t *src2, Word_t *imm, i
 
 int riscv32::decode_exec()
 {
-    if(this->CPU_State.CurrentPrivilegeMode>3)assert(0);
     int rd = 0;
     Word_t src1 = 0, src2 = 0, imm = 0, zimm = 0;
     zimm = BITS(this->inst ,19,15);
     CPU_State.dnpc = this->CPU_State.pc + 4;
     if(this->BUSObj->BUSRead(0x02000000,4)){
-        WCsr(mipAddr,RCsr(mipAddr)|(1<<7));
+        MWCsr(mipAddr,MRCsr(mipAddr)|(1<<7));
         this->wfiFlag=0;
     }
-    else WCsr(mipAddr,RCsr(mipAddr)&(~(1<<7)));
+    else MWCsr(mipAddr,MRCsr(mipAddr)&(~(1<<7)));
     if(this->wfiFlag)return 0;
-    if ((RCsr(mipAddr)&(1<<7))&&(RCsr(mieAddr)&(1<<7))&&(RCsr(mstatusAddr)&(1<<7)))
+    if ((MRCsr(mipAddr)&(1<<7))&&(MRCsr(mieAddr)&(1<<7))&&(MRCsr(mstatusAddr)&(1<<7)))
     {
         printf("\nfuck   time = %lx:%lx  mach=%lx:%lx   %d\n",this->BUSObj->BUSRead(0X2004000,4),BUSObj->BUSRead(0X2004004,4),BUSObj->BUSRead(0X200BFF8,4),BUSObj->BUSRead(0X200BFFc,4),BUSObj->BUSRead(0x02000000,4));
         this->CPU_State.trap = 0x80000007;
@@ -147,15 +146,15 @@ int riscv32::decode_exec()
         INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or, R, R(rd) = src1 | src2);
         INSTPAT("0000000 ????? ????? 111 ????? 01100 11", sub, R, R(rd) = src1 & src2);
 
-        INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi, I, R(rd) = src1 + imm);
-        INSTPAT("??????? ????? ????? 010 ????? 00100 11", sltiu, I, R(rd) = (src1 < imm) ? 1 : 0);
-        INSTPAT("??????? ????? ????? 011 ????? 00100 11", slti, I, R(rd) = (src1 < imm) ? 1 : 0);
+        INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi, I, R(rd) = src1 + imm;);
+        INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu, I, R(rd) = ((uint32_t)src1 < (uint32_t)imm) );
+        INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti, I, R(rd) = ((int32_t)(src1) < (int32_t)imm)) ;  
         INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori, I, R(rd) = src1 ^ imm);
         INSTPAT("??????? ????? ????? 110 ????? 00100 11", ori, I, R(rd) = src1 | imm);
         INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi, I, R(rd) = src1 & imm);
         INSTPAT("0000000 ????? ????? 001 ????? 00100 11", slli, I, R(rd) = src1 << imm);
         INSTPAT("0000000 ????? ????? 101 ????? 00100 11", srli, I, R(rd) = src1 >> imm);
-        INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai, I, R(rd) = ((src1 >> (imm & 0x0000ffff)) | ((src1 >> 31) == 1 ? ((0xffffffff >> (32u - (imm & 0x0000ffff))) << (32u - (imm & 0x0000ffff))) : 0x0000000)));
+        INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai, I, R(rd) = (((int32_t)src1 >> (imm & 0x00001f)) ));
         INSTPAT("??????? ????? ????? 000 ????? 00000 11", lb, I, R(rd) = SEXT(Mr(src1 + imm, 1), 8));
         INSTPAT("??????? ????? ????? 001 ????? 00000 11", lh, I, R(rd) = SEXT(Mr(src1 + imm, 2), 16));
         INSTPAT("??????? ????? ????? 010 ????? 00000 11", lw, I, R(rd) = Mr(src1 + imm, 4););
@@ -164,7 +163,7 @@ int riscv32::decode_exec()
         INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr, I, R(rd) = CPU_State.pc + 4; CPU_State.dnpc = src1 + imm);
 
         INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I, if (this->CPU_State.CurrentPrivilegeMode == 3)CPU_State.trap=11;else CPU_State.trap=8;); 
-        INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = RCsr(mepcAddr);Word_t OldPrivilegeMode  =CPU_State.CurrentPrivilegeMode; this->CPU_State.CurrentPrivilegeMode = (RCsr(mstatusAddr)&0x1800)>>11;WCsr( mstatusAddr , (( RCsr(mstatusAddr) & 0x80) >> 4) | OldPrivilegeMode<<11  ); );  
+        INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = MRCsr(mepcAddr);Word_t Oldmstatus  =MRCsr(mstatusAddr); MWCsr( mstatusAddr , (( MRCsr(mstatusAddr) & 0x80) >> 4) | CPU_State.CurrentPrivilegeMode<<11  ); this->CPU_State.CurrentPrivilegeMode = (Oldmstatus&0x1800)>>11;);  
 
         INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb, S, Mw(src1 + imm, src2, 1));
         INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh, S, Mw(src1 + imm, src2, 2));
@@ -201,6 +200,7 @@ int riscv32::decode_exec()
         INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = (int64_t)(signed)src1 * (int64_t)(signed)src2);
         INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh, R, R(rd) = ((((int64_t)(signed)src1) * ((int64_t)(signed)src2)) >> 32));
         INSTPAT("0000001 ????? ????? 010 ????? 01100 11", mulhsu, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * (src2)) >> 32));
+
         INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu, R, R(rd) = ((((unsigned long)(unsigned)src1) * ((unsigned long)(unsigned)src2)) >> 32));
         INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div, R, {if(src2==0)R(rd)=-1; else R(rd) = ((int32_t)src1 == INT32_MIN && (int32_t)src2 == -1)?src1 : ((int32_t)src1/(int32_t)src2) ; });
         INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu, R, R(rd) = (src2 == 0) ? 0xffffffff : src1 / src2);
@@ -232,22 +232,22 @@ int riscv32::decode_exec()
        
         if (this->CPU_State.trap & 0x80000000)
         {
-            WCsr(mcauseAddr,CPU_State.trap);
-            WCsr(mtvalAddr,0);
-            WCsr(mepcAddr,CPU_State.pc);
+            MWCsr(mcauseAddr,CPU_State.trap);
+            MWCsr(mtvalAddr,0);
+            MWCsr(mepcAddr,CPU_State.pc);
             
         }
         else
         {
-            WCsr(mcauseAddr,CPU_State.trap);
-            WCsr(mtvalAddr,CPU_State.pc );
-            WCsr(mepcAddr,CPU_State.pc+4);
+            MWCsr(mcauseAddr,CPU_State.trap);
+            MWCsr(mtvalAddr,CPU_State.pc );
+            MWCsr(mepcAddr,CPU_State.pc+4);
             
         }
-
-        WCsr(mstatusAddr,(((RCsr(mstatusAddr)&0x08)<<4)|CPU_State.CurrentPrivilegeMode<<11));
+        // printf("get a trap = %x\n",CPU_State.trap);
+        MWCsr(mstatusAddr,(((MRCsr(mstatusAddr)&0x08)<<4)|CPU_State.CurrentPrivilegeMode<<11));
         this->CPU_State.CurrentPrivilegeMode=3;
-        this->CPU_State.dnpc = RCsr(mtvecAddr);
+        this->CPU_State.dnpc = MRCsr(mtvecAddr);
         this->CPU_State.trap = 0;
     }
     R(0) = 0; // reset $zero to 0

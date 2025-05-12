@@ -17,6 +17,8 @@ static inline int check_reg_idx(int idx) {
   #define gpr(idx) (CPU_State.gpr[check_reg_idx(idx)])
   #define RCsr(idx) CPU_State.ReadCSR(check_csrreg_idx(idx))
   #define WCsr(idx,WData) CPU_State.WriteCSR(check_csrreg_idx(idx),WData)
+  #define MRCsr(idx) CPU_State.MReadCSR(check_csrreg_idx(idx))
+  #define MWCsr(idx,WData) CPU_State.MWriteCSR(check_csrreg_idx(idx),WData)
 
 
   static inline const char* reg_name(int idx) {
@@ -28,6 +30,7 @@ static inline int check_reg_idx(int idx) {
 #define R(i) gpr(i)
 #define Mr this->BUSObj->BUSRead
 #define Mw this->BUSObj->BUSWirte
+
 
 enum {
   TYPE_I, TYPE_U, TYPE_S,
