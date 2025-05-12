@@ -209,7 +209,7 @@ int riscv32::decode_exec()
 
         // 原子指令 note
         INSTPAT("00010?? 00000 ????? 010 ????? 01011 11", lr_w, R, Word_t tmp = this->BUSObj->BUSRead(src1, 4); R(rd) = tmp;this->LRADDRFLag=src1);
-        INSTPAT("00011?? ????? ????? 010 ????? 01011 11", sc_w, R,bool ifvalid =(LRADDRFLag==src1);if(ifvalid) this->BUSObj->BUSWirte(src1, src2, 4); R(rd) = !ifvalid);
+        INSTPAT("00011?? ????? ????? 010 ????? 01011 11", sc_w, R,bool ifvalid =(LRADDRFLag==src1);if(ifvalid) this->BUSObj->BUSWirte(src1, src2, 4); R(rd) = !ifvalid;this->LRADDRFLag=0;);
         INSTPAT("00001?? ????? ????? 010 ????? 01011 11", amoswap_w, R, Word_t tmp = this->BUSObj->BUSRead(src1, 4); this->BUSObj->BUSWirte(src1, src2, 4); R(rd) = tmp);
         INSTPAT("00000?? ????? ????? 010 ????? 01011 11", amoadd_w, R, Word_t tmp = this->BUSObj->BUSRead(src1, 4); this->BUSObj->BUSWirte(src1, src2 + tmp, 4); R(rd) = tmp);
         INSTPAT("00100?? ????? ????? 010 ????? 01011 11", amoxor_w, R, Word_t tmp = this->BUSObj->BUSRead(src1, 4); this->BUSObj->BUSWirte(src1, src2 ^ tmp, 4); R(rd) = tmp);

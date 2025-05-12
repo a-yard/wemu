@@ -82,3 +82,4 @@ makeqemu:
 
 get:
 	cp /home/wsp/StartLinux/mini-rv32ima/mini-rv32ima/mini-rv32ima .
+
