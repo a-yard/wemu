@@ -14,6 +14,7 @@ public:
     VAddr_t pc;
     Word_t trap;
     VAddr_t dnpc; // dynamic next pc
+    Word_t CurrentPrivilegeMode;
     // Word_t  ReadCSR(Word_t CSRNumber){
     //     Word_t ReturnData = csr[CSRNumber].Reg;
     //     Word_t PrivilegedLevelMode = 3;//(csr[mstatusAddr].Reg&0x1800)>>11;
@@ -59,12 +60,9 @@ public:
     }
     Word_t ReadCSR(Word_t CSRNumber)
     {
-        if (CSRNumber == cycleAddr)
-        {
-            printf("oldvalid = %x CSRNumber==cycleAddr\n", csr.csrvector[GetCsrId(cycleAddr)].Reg);
-        }
-        Word_t PrivilegedLevelMode = 3; //(csr[mstatusAddr].Reg&0x1800)>>11;
-        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel >= PrivilegedLevelMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
+        
+      
+        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel >= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
             return csr.csrvector[GetCsrId(CSRNumber)].Reg;
         else
         {
@@ -79,8 +77,7 @@ public:
 
         if (WData == csr.csrvector[GetCsrId(CSRNumber)].Reg & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
             return;
-        Word_t PrivilegedLevelMode = 3; //(csr[mstatusAddr].Reg&0x1800)>>11;
-        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel >= PrivilegedLevelMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL" & csr.csrvector[GetCsrId(CSRNumber)].RWPermission < 3)
+        if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel >= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL" & csr.csrvector[GetCsrId(CSRNumber)].RWPermission < 3)
         {
             csr.csrvector[GetCsrId(CSRNumber)].Reg = WData;
         }

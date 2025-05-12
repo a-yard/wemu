@@ -55,6 +55,8 @@ private:
     void restart();
     void decode_operand( int *rd, Word_t *src1, Word_t *src2, Word_t *imm, int type);
     int decode_exec();
+    Word_t LRADDRFLag;
+    bool wfiFlag;
 
     
     Word_t inst;

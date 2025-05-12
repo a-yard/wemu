@@ -19,33 +19,36 @@ uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
     UpDataState();
     
     uint32_t ReadData=-1;
-    switch (addr&0x10000)
+    switch (addr)
     {
-    case 0XBFF8:
+    case 0X200BFF8:
         ReadData=this->mtimeL;
         break;
-    case 0XBFFC:
+    case 0X200BFFC:
         ReadData=this->mtimeH;
         break;
-    case 0X4000:
+    case 0X2004000:
         ReadData=this->mtimecmpL;
         break;
-    case 0X4004:
+    case 0X2004004:
         ReadData=this->mtimecmpH;
         break;
-    case 0:
+    case 0x2000000:
         ReadData=this->msip;
         break;
     default:
         assert(0);
         break;
     }
+    // if(addr!=0x02000000)
     // printf("\nread addr = %x data = %x\n",addr,ReadData);
 
     return ReadData;
 }
 void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
     // printf("\n  CLINT Write addr = %x  wdata = %x\n",addr,data);
+    // if(addr!=0x02000000)
+    // printf("\ Write addr = %x data = %x\n",addr,data);
     switch (addr)
     {
     case 0X200BFF8:
@@ -76,12 +79,15 @@ void CLINT::UpDataState(){
     time(&timep);
     // 强制转换为 64 位无符号整数（确保兼容性）
     uint64_t time_val = (uint64_t)timep;
+    uint64_t WemuTime =(time_val-StartTime);
     // 提取高 32 位和低 32 位
-    this->mtimeH = (uint32_t)((time_val-StartTime) >> 32); // 右移 32 位取高 32 位
-    this->mtimeL  = (uint32_t)((time_val-StartTime) & 0xFFFFFFFF); // 掩码取低 32 位
-
-    uint64_t mtime = ((uint64_t)this->mtimeH)<<32+this->mtimeL;
-    uint64_t mtimecmp = ((uint64_t)this->mtimecmpH)<<32+this->mtimecmpL;
+    this->mtimeH = (uint32_t)(WemuTime >> 32); // 右移 32 位取高 32 位
+    this->mtimeL  = (uint32_t)(WemuTime & 0xFFFFFFFF); // 掩码取低 32 位
+    uint64_t mtime = ((uint64_t)this->mtimeH)<<32;//+this->mtimeL;
+    mtime += this->mtimeL;
+    uint64_t mtimecmp = ((uint64_t)this->mtimecmpH)<<32;//+this->mtimecmpL;
+    mtimecmp += this->mtimecmpL;
+    // printf("%lx  %lx  %x\n",mtime,mtimecmp,msip);
     if(	mtime >= mtimecmp){
         this->msip=1;
     }
