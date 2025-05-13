@@ -116,6 +116,7 @@ void riscv32::decode_operand(int *rd, Word_t *src1, Word_t *src2, Word_t *imm, i
 
 int riscv32::decode_exec()
 {
+    if(this->CPU_State.CurrentPrivilegeMode>3)assert(0);
     int rd = 0;
     Word_t src1 = 0, src2 = 0, imm = 0, zimm = 0;
     zimm = BITS(this->inst ,19,15);
@@ -162,8 +163,8 @@ int riscv32::decode_exec()
         INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu, I, R(rd) = Mr(src1 + imm, 2));
         INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr, I, R(rd) = CPU_State.pc + 4; CPU_State.dnpc = src1 + imm);
 
-        INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I, if (this->CPU_State.CurrentPrivilegeMode == 3)CPU_State.trap=11;else CPU_State.trap=8;); 
-        INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = MRCsr(mepcAddr);Word_t Oldmstatus  =MRCsr(mstatusAddr); MWCsr( mstatusAddr , (( MRCsr(mstatusAddr) & 0x80) >> 4) | CPU_State.CurrentPrivilegeMode<<11  ); this->CPU_State.CurrentPrivilegeMode = (Oldmstatus&0x1800)>>11;);  
+        INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I,CPU_State.trap=(CPU_State.CurrentPrivilegeMode&3)?11:8;); 
+        INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = MRCsr(mepcAddr);Word_t Oldmstatus  =MRCsr(mstatusAddr); MWCsr( mstatusAddr , (( MRCsr(mstatusAddr) & 0x80) >> 4) | CPU_State.CurrentPrivilegeMode<<11  ); this->CPU_State.CurrentPrivilegeMode = (Oldmstatus>>11)&3;);  
 
         INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb, S, Mw(src1 + imm, src2, 1));
         INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh, S, Mw(src1 + imm, src2, 2));
@@ -186,15 +187,15 @@ int riscv32::decode_exec()
         // fence
         INSTPAT("0000??? ????? 00000 000 00000 00011 11", fence, I, );
         INSTPAT("0000000 00000 00000 001 00000 00011 11", fence_i, I, );
-        INSTPAT("0001000 00101 00000 000 00000 11100 11", wfi, I,WCsr(mstatusAddr,RCsr(mstatusAddr)|8); wfiFlag=1;);
+        INSTPAT("0001000 00101 00000 000 00000 11100 11", wfi, I,MWCsr(mstatusAddr,MRCsr(mstatusAddr)|8); wfiFlag=1;);
 
         // csr
-        INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t = RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), src1); R(rd) = t);
-        INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), src1 | t); R(rd) = t);
-        INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), src1 & t); R(rd) = t);
-        INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t = RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), zimm); R(rd) = t);     // note
-        INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), t | zimm); R(rd) = t); // note
-        INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), t & zimm); R(rd) = t); // note
+        INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t =0; if(rd!=0)t=RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), src1); R(rd) = t);
+        INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = RCsr(USEXT( imm,12)); if (zimm != 0)WCsr(USEXT( imm,12), src1 | t); R(rd) = t);
+        INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = RCsr(USEXT( imm,12)); if (zimm != 0)WCsr(USEXT( imm,12), t & ~src1); R(rd) = t);
+        INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t =0; if(rd!=0)t=RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), zimm); R(rd) = t);     // note
+        INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t | zimm); R(rd) = t;); // note
+        INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t & ~zimm); R(rd) = t); // note
 
         // M  note
         INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = (int64_t)(signed)src1 * (int64_t)(signed)src2);
@@ -220,7 +221,7 @@ int riscv32::decode_exec()
         INSTPAT("11000?? ????? ????? 010 ????? 01011 11", amominu_w, R, Word_t tmp = this->BUSObj->BUSRead(src1, 4); if (src2 < tmp) this->BUSObj->BUSWirte(src1, src2, 4); else this->BUSObj->BUSWirte(src1, tmp, 4); R(rd) = tmp);
         INSTPAT("11100?? ????? ????? 010 ????? 01011 11", amomaxu_w, R, Word_t tmp = this->BUSObj->BUSRead(src1, 4); if (src2 > tmp) this->BUSObj->BUSWirte(src1, src2, 4); else this->BUSObj->BUSWirte(src1, tmp, 4); R(rd) = tmp);
 
-        INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, invalid_inst(this->CPU_State.pc));
+        INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, this->CPU_State.trap=2);//invalid_inst(this->CPU_State.pc)
 
         INSTPAT_END();
     }
@@ -250,6 +251,7 @@ int riscv32::decode_exec()
         this->CPU_State.dnpc = MRCsr(mtvecAddr);
         this->CPU_State.trap = 0;
     }
+
     R(0) = 0; // reset $zero to 0
     this->CPU_State.pc = CPU_State.dnpc;
     

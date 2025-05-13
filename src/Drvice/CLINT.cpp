@@ -8,11 +8,6 @@ CLINT::CLINT(){
     this->mtimeH=0;
     this->mtimeL=0;
     this->msip=0;
-    time_t timep;
-    time(&timep);
-    // 强制转换为 64 位无符号整数（确保兼容性）
-    uint64_t time_val = (uint64_t)timep;
-    this->StartTime = time_val;
 }
 
 uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
@@ -40,15 +35,12 @@ uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
         assert(0);
         break;
     }
-    // if(addr!=0x02000000)
-    // printf("\nread addr = %x data = %x\n",addr,ReadData);
+
 
     return ReadData;
 }
 void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
-    // printf("\n  CLINT Write addr = %x  wdata = %x\n",addr,data);
-    // if(addr!=0x02000000)
-    // printf("\ Write addr = %x data = %x\n",addr,data);
+    UpDataState();
     switch (addr)
     {
     case 0X200BFF8:
@@ -75,11 +67,11 @@ void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
 }
 
 void CLINT::UpDataState(){
-    time_t timep;
-    time(&timep);
-    // 强制转换为 64 位无符号整数（确保兼容性）
-    uint64_t time_val = (uint64_t)timep;
-    uint64_t WemuTime =(time_val-StartTime);
+    struct timeval tv;
+	gettimeofday( &tv, 0 );
+	tv.tv_usec + ((uint64_t)(tv.tv_sec)) * 1000000LL;
+  
+    uint64_t WemuTime =tv.tv_usec + ((uint64_t)(tv.tv_sec)) * 1000000LL;
     // 提取高 32 位和低 32 位
     this->mtimeH = (uint32_t)(WemuTime >> 32); // 右移 32 位取高 32 位
     this->mtimeL  = (uint32_t)(WemuTime & 0xFFFFFFFF); // 掩码取低 32 位

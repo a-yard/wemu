@@ -8,7 +8,7 @@
 #include "macro.h"
 #include "auto.h"
 #include <iostream>
-#include <time.h>
+#include <sys/time.h>
 #include <vector>
 typedef uint32_t VAddr_t;
 typedef uint32_t Word_t;

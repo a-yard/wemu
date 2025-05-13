@@ -3,7 +3,9 @@
 UART::UART(){
     this->BlockDeviceBASE = UART_BASE;
     this->BlockDeviceSIZE = UART_SIZE;
-    this->UartReg[5]=0x61;
+    this->UartReg[5]=0x60;
+    this->UartReg[0]=0;
+    
 
 }
 

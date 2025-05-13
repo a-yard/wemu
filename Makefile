@@ -63,7 +63,7 @@ include TestMakefile.mk
 runtest:CreateExec
 	cp ./test/$(name).dump .
 	riscv64-unknown-elf-objcopy -O binary ./test/$(name) $(name).bin
-	@./build/wemu -b -t ./build/HaiTang.dtb    $(name).bin
+	@./build/wemu  -t ./build/HaiTang.dtb    $(name).bin
 	@rm $(name).bin
 	@rm $(name).dump
 
@@ -83,3 +83,10 @@ makeqemu:
 get:
 	cp /home/wsp/StartLinux/mini-rv32ima/mini-rv32ima/mini-rv32ima .
 
+# /home/wsp/StartLinux/qemu/build/qemu-system-riscv64 -M virt -smp 4 -m 4G \
+# -bios opensbi/build/platform/generic/firmware/fw_jump.bin \
+# -kernel linux-5.15.180/arch/riscv/boot/Image \
+# -initrd buildroot-2025.02/output/images/rootfs.cpio \
+# -append "root=/dev/ram" \
+# -display none -serial stdio \
+# -device virtio-scsi-device  -s -S

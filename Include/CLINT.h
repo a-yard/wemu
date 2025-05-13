@@ -9,7 +9,6 @@ class CLINT:public CharacterDevice{
         Word_t mtimecmpH;
         Word_t msip;
         void UpDataState();
-        uint64_t StartTime;
 
     public:
         CLINT();
