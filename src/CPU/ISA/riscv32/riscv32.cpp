@@ -121,13 +121,26 @@ int riscv32::decode_exec()
     Word_t src1 = 0, src2 = 0, imm = 0, zimm = 0;
     zimm = BITS(this->inst ,19,15);
     CPU_State.dnpc = this->CPU_State.pc + 4;
-    if(this->BUSObj->BUSRead(0x02000000,4)){
+
+    Word_t timerh;
+    Word_t timerl;
+    Word_t timermatchh;
+    Word_t timermatchl;
+    timerh = this->BUSObj->BUSRead(0X200BFFC,4);
+    timerl = this->BUSObj->BUSRead(0X200BFF8,4);
+    timermatchh = this->BUSObj->BUSRead(0X2004004,4);
+    timermatchl = this->BUSObj->BUSRead(0X2004000,4);
+    //(  timerh  >  timermatchh  || (  timerh  ==  timermatchh  &&  timerl  >  timermatchl  ) ) && (  timermatchh  ||  timermatchl  )
+    if( (  timerh  >  timermatchh  || (  timerh  ==  timermatchh  &&  timerl  >  timermatchl  ) ) && (  timermatchh  ||  timermatchl  )){
         MWCsr(mipAddr,MRCsr(mipAddr)|(1<<7));
         this->wfiFlag=0;
     }
     else MWCsr(mipAddr,MRCsr(mipAddr)&(~(1<<7)));
-    if(this->wfiFlag)return 0;
-    if ((MRCsr(mipAddr)&(1<<7))&&(MRCsr(mieAddr)&(1<<7))&&(MRCsr(mstatusAddr)&(1<<7)))
+    if(this->wfiFlag){
+        // printf("wait wif\n");
+        return 0;
+    }
+    if ((MRCsr(mipAddr)&(1<<7))&&(MRCsr(mieAddr)&(1<<7))&&(MRCsr(mstatusAddr)&0x08))
     {
         printf("\nfuck   time = %lx:%lx  mach=%lx:%lx   %d\n",this->BUSObj->BUSRead(0X2004000,4),BUSObj->BUSRead(0X2004004,4),BUSObj->BUSRead(0X200BFF8,4),BUSObj->BUSRead(0X200BFFc,4),BUSObj->BUSRead(0x02000000,4));
         this->CPU_State.trap = 0x80000007;
@@ -164,7 +177,7 @@ int riscv32::decode_exec()
         INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr, I, R(rd) = CPU_State.pc + 4; CPU_State.dnpc = src1 + imm);
 
         INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, I,CPU_State.trap=(CPU_State.CurrentPrivilegeMode&3)?11:8;); 
-        INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = MRCsr(mepcAddr);Word_t Oldmstatus  =MRCsr(mstatusAddr); MWCsr( mstatusAddr , (( MRCsr(mstatusAddr) & 0x80) >> 4) | CPU_State.CurrentPrivilegeMode<<11  ); this->CPU_State.CurrentPrivilegeMode = (Oldmstatus>>11)&3;);  
+        INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, I, CPU_State.dnpc = MRCsr(mepcAddr);Word_t Oldmstatus  =MRCsr(mstatusAddr); MWCsr( mstatusAddr , ((( MRCsr(mstatusAddr) & 0x80) >> 4) | (CPU_State.CurrentPrivilegeMode<<11) | 0x80) ); this->CPU_State.CurrentPrivilegeMode = (Oldmstatus>>11)&3;);  
 
         INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb, S, Mw(src1 + imm, src2, 1));
         INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh, S, Mw(src1 + imm, src2, 2));
@@ -191,17 +204,16 @@ int riscv32::decode_exec()
 
         // csr
         INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I, Word_t t =0; if(rd!=0)t=RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), src1); R(rd) = t);
-        INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = RCsr(USEXT( imm,12)); if (zimm != 0)WCsr(USEXT( imm,12), src1 | t); R(rd) = t);
-        INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = RCsr(USEXT( imm,12)); if (zimm != 0)WCsr(USEXT( imm,12), t & ~src1); R(rd) = t);
-        INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t =0; if(rd!=0)t=RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), zimm); R(rd) = t);     // note
-        INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t | zimm); R(rd) = t;); // note
-        INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t & ~zimm); R(rd) = t); // note
+        INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), src1 | t); R(rd) = t);
+        INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t & ~src1); R(rd) = t);
+        INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I, Word_t t =0;  if(rd!=0)t=RCsr(USEXT( imm,12)); WCsr(USEXT( imm,12), zimm); R(rd) = t);     
+        INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t | zimm); R(rd) = t;); 
+        INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I, Word_t t = RCsr(USEXT( imm,12)); if(zimm!=0)WCsr(USEXT( imm,12), t & ~zimm); R(rd) = t); 
 
         // M  note
         INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R, R(rd) = (int64_t)(signed)src1 * (int64_t)(signed)src2);
         INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh, R, R(rd) = ((((int64_t)(signed)src1) * ((int64_t)(signed)src2)) >> 32));
         INSTPAT("0000001 ????? ????? 010 ????? 01100 11", mulhsu, R, R(rd) = (uint32_t)((((signed long)(signed)src1) * (src2)) >> 32));
-
         INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu, R, R(rd) = ((((unsigned long)(unsigned)src1) * ((unsigned long)(unsigned)src2)) >> 32));
         INSTPAT("0000001 ????? ????? 100 ????? 01100 11", div, R, {if(src2==0)R(rd)=-1; else R(rd) = ((int32_t)src1 == INT32_MIN && (int32_t)src2 == -1)?src1 : ((int32_t)src1/(int32_t)src2) ; });
         INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu, R, R(rd) = (src2 == 0) ? 0xffffffff : src1 / src2);
@@ -242,11 +254,11 @@ int riscv32::decode_exec()
         {
             MWCsr(mcauseAddr,CPU_State.trap);
             MWCsr(mtvalAddr,CPU_State.pc );
-            MWCsr(mepcAddr,CPU_State.pc+4);
+            MWCsr(mepcAddr,CPU_State.pc);
             
         }
-        // printf("get a trap = %x\n",CPU_State.trap);
-        MWCsr(mstatusAddr,(((MRCsr(mstatusAddr)&0x08)<<4)|CPU_State.CurrentPrivilegeMode<<11));
+        // printf("\nget a trap = %x  pc =  %x  instr = 0x%x\n",CPU_State.trap,CPU_State.pc,this->inst);
+        MWCsr(mstatusAddr,(((MRCsr(mstatusAddr)&0x08)<<4)|((CPU_State.CurrentPrivilegeMode&3)<<11)));
         this->CPU_State.CurrentPrivilegeMode=3;
         this->CPU_State.dnpc = MRCsr(mtvecAddr);
         this->CPU_State.trap = 0;
@@ -261,6 +273,7 @@ int riscv32::decode_exec()
 int riscv32::isa_exec_once()
 {
     this->inst = this->BUSObj->BUSRead(this->CPU_State.pc, 4);
+    this->BUSObj->CLINTObj->UpDataState();
     // cout << "PC:" << hex << this->CPU_State.pc << ": 0x" << hex << inst << endl;
     this->decode_exec();
     this->CPU_State.Addcycle();

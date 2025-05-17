@@ -8,11 +8,12 @@ class CLINT:public CharacterDevice{
         Word_t mtimecmpL;
         Word_t mtimecmpH;
         Word_t msip;
-        void UpDataState();
+       
 
     public:
         CLINT();
         virtual uint32_t DrviceRead(uint32_t addr, int len) ;
         virtual void DrviceWrite(uint32_t addr, int len, uint32_t data) ;
+        void UpDataState();
 };
 #endif

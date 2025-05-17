@@ -11,8 +11,6 @@ CLINT::CLINT(){
 }
 
 uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
-    UpDataState();
-    
     uint32_t ReadData=-1;
     switch (addr)
     {
@@ -36,11 +34,9 @@ uint32_t CLINT::DrviceRead(uint32_t addr, int len) {
         break;
     }
 
-
     return ReadData;
 }
 void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
-    UpDataState();
     switch (addr)
     {
     case 0X200BFF8:
@@ -69,9 +65,8 @@ void CLINT::DrviceWrite(uint32_t addr, int len, uint32_t data) {
 void CLINT::UpDataState(){
     struct timeval tv;
 	gettimeofday( &tv, 0 );
-	tv.tv_usec + ((uint64_t)(tv.tv_sec)) * 1000000LL;
   
-    uint64_t WemuTime =tv.tv_usec + ((uint64_t)(tv.tv_sec)) * 1000000LL;
+    uint64_t WemuTime =((uint64_t)(tv.tv_sec)) * 1000000LL ;//tv.tv_usec + 
     // 提取高 32 位和低 32 位
     this->mtimeH = (uint32_t)(WemuTime >> 32); // 右移 32 位取高 32 位
     this->mtimeL  = (uint32_t)(WemuTime & 0xFFFFFFFF); // 掩码取低 32 位

@@ -64,11 +64,11 @@ public:
       
         if (csr.csrvector[GetCsrId(CSRNumber)].PrivilegedLevel <= CurrentPrivilegeMode & csr.csrvector[GetCsrId(CSRNumber)].CsrName != "NULL")
             return csr.csrvector[GetCsrId(CSRNumber)].Reg;
-        else
-        {
-            printf("CurrentPrivilegeMode = %x  rerrorcsr(%s) 0x%x\n",this->CurrentPrivilegeMode,csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
-            trap = 0x2;
-        }
+        // else
+        // {
+        //     printf("CurrentPrivilegeMode = %x  rerrorcsr(%s) 0x%x\n",this->CurrentPrivilegeMode,csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
+        //     trap = 0x2;
+        // }
         return 0;
     }
 
@@ -81,11 +81,11 @@ public:
         {
             csr.csrvector[GetCsrId(CSRNumber)].Reg = WData;
         }
-        else
-        {
-            printf("CurrentPrivilegeMode = %x   werrorcsr(%s) 0x%x\n",this->CurrentPrivilegeMode, csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
-            trap = 0x2;
-        }
+        // else
+        // {
+        //     printf("CurrentPrivilegeMode = %x   werrorcsr(%s) 0x%x\n",this->CurrentPrivilegeMode, csr.csrvector[GetCsrId(CSRNumber)].CsrName.c_str(), CSRNumber);
+        //     trap = 0x2;
+        // }
     }
 
     Word_t MReadCSR(Word_t CSRNumber)
