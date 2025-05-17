@@ -4,7 +4,7 @@ UART::UART(){
     
     this->BlockDeviceBASE = UART_BASE;
     this->BlockDeviceSIZE = UART_SIZE;
-    this->UartReg[5]=0x61;
+    this->UartReg[5]=0x60;
     this->UartReg[0]=0;
     
 
@@ -12,7 +12,7 @@ UART::UART(){
 
 uint32_t UART::DrviceRead(uint32_t addr, int len) {
     if(len!=1)assert(0);
-    if(addr==0x10000005)return 0x60 | IsKBHit();
+    if(addr==0x10000005)return 0x60 ;//| IsKBHit();
     else if(addr == 0x10000000 && IsKBHit() ) return ReadKBByte();
     else return 0;
     // return this->UartReg[addr&0x7];

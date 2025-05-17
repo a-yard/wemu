@@ -8,6 +8,8 @@ Flash::Flash(){
 }
 
 Flash::Flash(char* ImgFile){
-    Flash();
+    this->BlockDeviceBASE = FLASH_BASE;
+    this->BlockDeviceSIZE = FLASH_SIZE;
+    this->PMem = (uint8_t*)malloc(this->BlockDeviceSIZE);
     this->load_img(ImgFile);
 }
