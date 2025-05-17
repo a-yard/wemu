@@ -6,13 +6,14 @@ UART::UART(){
     this->BlockDeviceSIZE = UART_SIZE;
     this->UartReg[5]=0x60;
     this->UartReg[0]=0;
+    this->is_eofd=0;
     
 
 }
 
 uint32_t UART::DrviceRead(uint32_t addr, int len) {
     if(len!=1)assert(0);
-    if(addr==0x10000005)return 0x60 ;//| IsKBHit();
+    if(addr==0x10000005)return 0x60 | IsKBHit();
     else if(addr == 0x10000000 && IsKBHit() ) return ReadKBByte();
     else return 0;
     // return this->UartReg[addr&0x7];
@@ -44,5 +45,5 @@ int UART::IsKBHit(){
 	int byteswaiting;
 	ioctl(0, FIONREAD, &byteswaiting);
 	if( !byteswaiting && write( fileno(stdin), 0, 0 ) != 0 ) { is_eofd = 1; return -1; } // Is end-of-file for 
-	return !!byteswaiting;
+	return ((!!byteswaiting)&0x1);
 }
