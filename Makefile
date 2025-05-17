@@ -42,8 +42,6 @@ getTest:
 	cp -rf /home/wsp/riscv-tests/isa/rv32* ./test/isa/
 	echo $(rv32uiPTests)
 
-# include TestMakefile.mk
-
 runOpenSpi: CreateExec compileDeviceTree
 	@./build/wemu  -t ./build/HaiTang.dtb    $(wemu_HOME)/build/fw_jump.bin
 
@@ -57,8 +55,6 @@ makeOpenSBI:
 
 rundlimage: CreateExec
 	@./build/wemu -b -t ./build/HaiTang.dtb    $(wemu_HOME)/build/DownloadedImage
-
-include TestMakefile.mk
 
 runtest:CreateExec
 	cp ./test/$(name).dump .
